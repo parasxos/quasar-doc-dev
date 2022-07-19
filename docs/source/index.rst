@@ -1,6 +1,3 @@
-.. image:: ./converted/images/quasar_engine_small_smooth_square_128x128.png
-   :alt: [logo]
-
 Quasar
 ======
 
@@ -471,8 +468,15 @@ column) at which moments you may need any of the above.
 
 --------------
 
+Documentation versions
+======================
+
+
+
+
 .. toctree::
    :caption: HTML documentation
+
 
 		Alternative backends <./converted/AlternativeBackends>
 		ChangeLog <./converted/ChangeLog>
@@ -487,7 +491,6 @@ column) at which moments you may need any of the above.
 		Windows setup <./converted/WindowsSetup>
 		Yocto <./converted/yocto>
 		Youtube links <./converted/youtube_links>
-
 
 
 .. toctree::

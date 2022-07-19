@@ -1,16 +1,31 @@
 import os
 import re
 import pypandoc
+from pathlib import Path
 
 str_dict = {
-  'REPO_URL': 'https://raw.githubusercontent.com/parasxos/quasar/master/Documentation'
+  'WEB_URL': 'http://128.141.204.240',
+  'REPO_URL': 'https://raw.githubusercontent.com/parasxos/quasar/master/Documentation',
 }
+
+HOME_PATH = str(Path.home())
+VERSIONS_PATH = os.path.join(HOME_PATH, 'quasar')
 
 def get_files(in_path, external_extensions = []):
   html_files = []
   note_files = []
   external_files = []
-  
+  current_versions = []
+
+  try:
+    folder_versions = os.listdir(VERSIONS_PATH)
+  except:
+    folder_versions = []
+
+  for folder_version in folder_versions:
+    if os.path.exists(os.path.join(VERSIONS_PATH, folder_version)):
+      current_versions.append(folder_version)
+
   for filename in os.listdir(in_path):
     extension = os.path.splitext(filename)[1]
   
@@ -18,14 +33,25 @@ def get_files(in_path, external_extensions = []):
       html_files.append(filename)
     elif extension in external_extensions:
       external_files.append(filename)
-  
+
   for filename in os.listdir(f'{in_path}/Notes'):
     note_files.append(filename)
 
+  current_versions.sort(key=lambda x: x.lower(), reverse=True)
   html_files.sort(key=lambda x: x.lower())
   note_files.sort(key=lambda x: x.lower())
   external_files.sort(key=lambda x: x.lower())
-  return html_files, external_files, note_files
+
+  print(
+    f"""
+    Found {len(current_versions)} versions: {current_versions}
+    Found {len(html_files)} html files
+    Found {len(note_files)} note files
+    Found {len(external_files)} external files
+    """
+  )
+
+  return html_files, external_files, note_files, current_versions
 
 
 def copy_external(html_path, output_path, extensions = []):
@@ -148,7 +174,7 @@ def insert_files(idx = 0, format_str = '', files = [], lines = [], exceptions = 
   return idx, lines
 
 
-def update_index(html_files, external_files, note_files, path_index, exceptions = []):
+def update_index(html_files, external_files, note_files, current_versions, path_index, exceptions = []):
   print('Updating index.rst')
 
   with open(path_index.replace('index', '_init_index'), 'r') as f:
@@ -161,8 +187,13 @@ def update_index(html_files, external_files, note_files, path_index, exceptions 
 
   lines = quasar_lines + lines
 
+  print('\tInserting versions')
+  idx_versions = find_line('Documentation versions', gap=3, lines=lines)
+  format_str = '- `{clean_name} <{WEB_URL}/{filename}/index.html>`_\n'
+  idx_versions, lines = insert_files(idx_versions, format_str, current_versions, lines, exceptions, str_dict)
+
   print(f'\tInserting html files')
-  idx_html = find_line('toctree', gap=3, lines=lines)
+  idx_html = find_line('HTML documentation', gap=3, lines=lines, start=idx_versions)
   format_str = '\t\t{clean_name} <./converted/{filename}>\n'
   idx_html, lines = insert_files(idx_html, format_str, html_files, lines, exceptions, is_rst=True)
 
@@ -173,6 +204,8 @@ def update_index(html_files, external_files, note_files, path_index, exceptions 
   idx_ext = find_line('Additional files', gap=3, start=idx_html, lines=lines)
   format_str = '\t{clean_name} <./{filename}>\n'
   idx_ext, lines = insert_files(idx_ext, format_str, rst_add_files, lines, exceptions, is_rst=True)
+
+  print('\n'.join(lines))
 
   with open(path_index, 'w') as f:
     f.writelines(lines)
