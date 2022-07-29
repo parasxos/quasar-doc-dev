@@ -18,9 +18,9 @@ jobs:
         echo "${GITHUB_WORKSPACE}/"
         cd "${GITHUB_WORKSPACE}/"
         pip3 install --user -r requirements.txt
-    - name: Create new release
+    - name: Create new branch
       run: |
-        echo "Creating new release ${{ github.ref_name }}"
+        echo "Creating new branch ${{ github.ref_name }}"
         mkdir -p /afs/cern.ch/user/f/fmagalla/quasar/${{ github.ref_name }}
     - name: Parse legacy documentation
       run: |
