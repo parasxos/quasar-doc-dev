@@ -1,9 +1,13 @@
-name: Deploy
+name: Deploy latest
 
 on:
   push:
     branches:
       - master
+  workflow_run:
+    workflows: [ "Deploy new release" ]
+    types:
+      - completed
 
 jobs:
   build_deploy:
@@ -47,5 +51,5 @@ jobs:
         echo 'Reloading nginx'
         echo Enma19624 | sudo -S nginx -s reload
 
-#        echo Enma19624 | sudo -S cp -f -a ./html/ /etc/nginx/quasar/latest
-#        echo Enma19624 | sudo -S chmod -R 660 . && chmod -R 660 /etc/nginx/quasar/latest/ 
+#        echo xx | sudo -S cp -f -a ./html/ /etc/nginx/quasar/latest
+#        echo xx | sudo -S chmod -R 660 . && chmod -R 660 /etc/nginx/quasar/latest/ 
