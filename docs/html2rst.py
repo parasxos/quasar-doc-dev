@@ -18,7 +18,7 @@ EXTERNAL_EXTENSIONS = ['.pdf', '.docx', '.xlsx', '.pptx', '.odg', '.png', '.jpg'
 pypandoc.pandoc_download.download_pandoc()
 
 # Get list of HTML files
-html_files, external_files, note_files = get_files(HTMLS_PATH, EXTERNAL_EXTENSIONS)
+html_files, external_files, note_files, current_versions = get_files(HTMLS_PATH, EXTERNAL_EXTENSIONS)
 
 # Copy current assets to output directory
 copy_external(HTMLS_PATH, OUTPUT_PATH, EXTERNAL_EXTENSIONS)
@@ -27,4 +27,4 @@ copy_external(HTMLS_PATH, OUTPUT_PATH, EXTERNAL_EXTENSIONS)
 parse_html_files(html_files, HTMLS_PATH, OUTPUT_PATH)
 
 # Update index content
-update_index(html_files, external_files, note_files, PATH_INDEX, EXCEPTIONS_CLEAN)
+update_index(html_files, external_files, note_files, current_versions, PATH_INDEX, EXCEPTIONS_CLEAN)
