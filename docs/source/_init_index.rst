@@ -2,10 +2,6 @@
 
 --------------
 
-Documentation versions
-======================
-
-
 
 
 .. toctree::
@@ -20,3 +16,6 @@ Documentation versions
 
 
 
+
+Documentation versions
+======================

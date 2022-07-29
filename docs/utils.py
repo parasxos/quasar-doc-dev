@@ -187,13 +187,8 @@ def update_index(html_files, external_files, note_files, current_versions, path_
 
   lines = quasar_lines + lines
 
-  print('\tInserting versions')
-  idx_versions = find_line('Documentation versions', gap=3, lines=lines)
-  format_str = '- `{clean_name} <{WEB_URL}/{filename}/index.html>`_\n'
-  idx_versions, lines = insert_files(idx_versions, format_str, current_versions, lines, exceptions, str_dict)
-
   print(f'\tInserting html files')
-  idx_html = find_line('HTML documentation', gap=3, lines=lines, start=idx_versions)
+  idx_html = find_line('HTML documentation', gap=3, lines=lines)
   format_str = '\t\t{clean_name} <./converted/{filename}>\n'
   idx_html, lines = insert_files(idx_html, format_str, html_files, lines, exceptions, is_rst=True)
 
@@ -204,6 +199,11 @@ def update_index(html_files, external_files, note_files, current_versions, path_
   idx_ext = find_line('Additional files', gap=3, start=idx_html, lines=lines)
   format_str = '\t{clean_name} <./{filename}>\n'
   idx_ext, lines = insert_files(idx_ext, format_str, rst_add_files, lines, exceptions, is_rst=True)
+
+  print('\tInserting versions')
+  idx_versions = find_line('Documentation versions', gap=3, start=idx_ext, lines=lines)
+  format_str = '- `{clean_name} <{WEB_URL}/{filename}/index.html>`_\n'
+  idx_versions, lines = insert_files(idx_versions, format_str, current_versions, lines, exceptions, str_dict)
 
   print('\n'.join(lines))
 
