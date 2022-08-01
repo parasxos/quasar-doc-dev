@@ -35,6 +35,7 @@ jobs:
         make html
     - name: Update server
       run: |
+        whoami
         echo 'Change dir location to build html'
         cd "${GITHUB_WORKSPACE}/docs/build/html"
 
@@ -46,7 +47,7 @@ jobs:
 
         ls -l
         echo 'Copying new build'
-        cp -f -a . /usr/share/nginx/quasar/latest
+        echo Enma19624 | sudo -S cp -f -a . /usr/share/nginx/quasar/latest
 
         echo 'Reloading nginx'
         echo Enma19624 | sudo -S nginx -s reload
