@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - feat-move-files-config
   workflow_run:
     workflows: [ "Deploy new release" ]
     types:
@@ -46,10 +47,10 @@ jobs:
         ls -l
         echo 'Copying new build'
         echo Enma19624 | sudo -S cp -f -a . /etc/nginx/quasar/latest
-#        ls -l /afs/cern.ch/user/f/fmagalla/quasar/latest
 
         echo 'Reloading nginx'
         echo Enma19624 | sudo -S nginx -s reload
 
+#        ls -l /afs/cern.ch/user/f/fmagalla/quasar/latest
 #        echo xx | sudo -S cp -f -a ./html/ /etc/nginx/quasar/latest
 #        echo xx | sudo -S chmod -R 660 . && chmod -R 660 /etc/nginx/quasar/latest/ 
