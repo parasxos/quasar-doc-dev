@@ -46,7 +46,7 @@ jobs:
 
         ls -l
         echo 'Copying new build'
-        echo Enma19624 | sudo -S cp -f -a . /usr/share/nginx/quasar/latest
+        cp -f -a . /usr/share/nginx/quasar/latest
 
         echo 'Reloading nginx'
         echo Enma19624 | sudo -S nginx -s reload
