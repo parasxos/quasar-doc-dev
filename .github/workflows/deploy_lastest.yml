@@ -39,18 +39,18 @@ jobs:
         cd "${GITHUB_WORKSPACE}/docs/build/html"
 
         echo 'Removing old build'
-        echo Enma19624 | sudo -S rm -rf /etc/nginx/quasar/latest
+        echo Enma19624 | sudo -S rm -rf /usr/share/nginx/quasar/latest
 
         echo 'Creating new build'
-        echo Enma19624 | sudo -S mkdir -p /etc/nginx/quasar/latest
+        echo Enma19624 | sudo -S mkdir -p /usr/share/nginx/quasar/latest
 
         ls -l
         echo 'Copying new build'
-        echo Enma19624 | sudo -S cp -f -a . /etc/nginx/quasar/latest
+        echo Enma19624 | sudo -S cp -f -a . /usr/share/nginx/quasar/latest
 
         echo 'Reloading nginx'
         echo Enma19624 | sudo -S nginx -s reload
 
 #        ls -l /afs/cern.ch/user/f/fmagalla/quasar/latest
-#        echo xx | sudo -S cp -f -a ./html/ /etc/nginx/quasar/latest
-#        echo xx | sudo -S chmod -R 660 . && chmod -R 660 /etc/nginx/quasar/latest/ 
+#        echo xx | sudo -S cp -f -a ./html/ /usr/share/nginx/quasar/latest
+#        echo xx | sudo -S chmod -R 660 . && chmod -R 660 /usr/share/nginx/quasar/latest/ 
