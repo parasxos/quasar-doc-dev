@@ -39,10 +39,10 @@ jobs:
         cd "${GITHUB_WORKSPACE}/docs/build/html"
 
         echo 'Removing old build'
-        rm -rf /etc/nginx/quasar/latest
+        echo Enma19624 | sudo -S rm -rf /etc/nginx/quasar/latest
 
         echo 'Creating new build'
-        mkdir -p /etc/nginx/quasar/latest
+        echo Enma19624 | sudo -S mkdir -p /etc/nginx/quasar/latest
 
         ls -l
         echo 'Copying new build'
