@@ -38,15 +38,15 @@ jobs:
         cd "${GITHUB_WORKSPACE}/docs/build/html"
 
         echo 'Removing old build'
-        rm -rf /afs/cern.ch/user/f/fmagalla/quasar/latest
+        rm -rf /etc/nginx/quasar/latest
 
         echo 'Creating new build'
-        mkdir -p /afs/cern.ch/user/f/fmagalla/quasar/latest
+        mkdir -p /etc/nginx/quasar/latest
 
         ls -l
         echo 'Copying new build'
-        cp -f -a . /afs/cern.ch/user/f/fmagalla/quasar/latest
-        ls -l /afs/cern.ch/user/f/fmagalla/quasar/latest
+        echo Enma19624 | sudo -S cp -f -a . /etc/nginx/quasar/latest
+#        ls -l /afs/cern.ch/user/f/fmagalla/quasar/latest
 
         echo 'Reloading nginx'
         echo Enma19624 | sudo -S nginx -s reload
