@@ -37,7 +37,7 @@ jobs:
       run: |
         whoami
         echo 'Change dir location to build html'
-        chown msagent "${GITHUB_WORKSPACE}" -R
+        chown root "${GITHUB_WORKSPACE}" -R
         cd "${GITHUB_WORKSPACE}/docs/build/html"
 
         echo 'Removing old build'
