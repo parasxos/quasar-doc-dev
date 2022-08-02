@@ -26,7 +26,7 @@ jobs:
       run: |
         cd "${GITHUB_WORKSPACE}/"
         ls -l ./docs/
-        python3 ./docs/html2rst.py
+        python3 ./docs/html2rst.py latest
     - name: Build documentation
       run: |
         cd "${GITHUB_WORKSPACE}/docs"

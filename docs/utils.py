@@ -174,7 +174,7 @@ def insert_files(idx = 0, format_str = '', files = [], lines = [], exceptions = 
   return idx, lines
 
 
-def update_index(html_files, external_files, note_files, current_versions, path_index, exceptions = []):
+def update_index(html_files, external_files, note_files, current_versions, version_name, path_index, exceptions = []):
   print('Updating index.rst')
 
   with open(path_index.replace('index', '_init_index'), 'r') as f:
@@ -183,6 +183,8 @@ def update_index(html_files, external_files, note_files, current_versions, path_
   with open('./docs/source/converted/quasar.rst', 'r') as f:
     quasar_lines = f.readlines()
     for idx, line in enumerate(quasar_lines):
+      if line == 'Quasar' and '=' in quasar_lines[idx + 1]:
+        line = f'Quasar {version_name}\n'
       quasar_lines[idx] = update_ref(line)
 
   lines = quasar_lines + lines
