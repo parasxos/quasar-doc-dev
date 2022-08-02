@@ -21,10 +21,10 @@ jobs:
 
     - name: Define version name
       run: |
-        if [[ ${{ startsWith(github.ref_name, 'dev') }} ]]; then
+        if [ ${{ startsWith(github.ref_name, 'dev') }} ]; then
           echo "VERSION_NAME=${{ github.ref_name }}" >> "$GITHUB_ENV"
           echo 'Choose a branch name for the release'
-        elif [[ ${{ github.event.release.tag_name != '' }} ]]; then
+        elif [ ${{ github.event.release.tag_name != '' }} ]; then
           echo "VERSION_NAME=${{ env.VERSION_NAME }}" >> "$GITHUB_ENV"
           echo 'Choose a tag name for the release'
         else
