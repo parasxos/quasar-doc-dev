@@ -24,3 +24,4 @@ docs/source/images
 docs/source/converted
 .vscode/
 *.pkg
+.DS_Store
