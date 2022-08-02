@@ -8,8 +8,19 @@ from utils import (
   update_index, copy_external, get_files
 )
 
-version_name = sys.argv[1]
-print(f'Converting to version {version_name}')
+version_names = sys.argv[1:]
+print(f'Version names: {version_names}')
+
+branch, release = version_names
+
+version_name = 'latest'
+
+if branch:
+  version_name = branch
+elif release:
+  version_name = release
+
+os.makedirs(f'/home/fmagalla/quasar/{version_name}', exist_ok=True)
 
 # Define constants
 HTMLS_PATH = './Documentation'
