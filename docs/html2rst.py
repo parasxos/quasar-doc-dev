@@ -9,16 +9,14 @@ from utils import (
 )
 
 version_names = sys.argv[1:]
-print(f'Version names: {version_names}')
-
-branch, release = version_names
 
 version_name = 'latest'
+if version_names[0] != 'master':
+  version_name = version_names[0]
+elif len(version_names) > 1:
+  version_name = version_names[1]
 
-if branch:
-  version_name = branch
-elif release:
-  version_name = release
+print(f'Version name: {version_name}')
 
 os.makedirs(f'/home/fmagalla/quasar/{version_name}', exist_ok=True)
 
