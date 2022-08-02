@@ -27,7 +27,7 @@ jobs:
         whoami
         cd "${GITHUB_WORKSPACE}/"
         ls -l ./docs/
-        python3 ./docs/html2rst.py
+        python3 ./docs/html2rst.py ${{ github.ref_name }}
     - name: Build documentation
       run: |
         cd "${GITHUB_WORKSPACE}/docs"
