@@ -37,8 +37,8 @@ jobs:
       run: |
         whoami
         echo 'Change dir location to build html'
-        echo Enma19624 | sudo -S chown root "${GITHUB_WORKSPACE}/docs/build/html" -R
         cd "${GITHUB_WORKSPACE}/docs/build/html"
+        ls -l
 
         echo 'Removing old build'
         echo Enma19624 | sudo -S rm -rf /usr/share/nginx/quasar/latest
@@ -46,7 +46,6 @@ jobs:
         echo 'Creating new build'
         echo Enma19624 | sudo -S mkdir -p /usr/share/nginx/quasar/latest
 
-        ls -l
         echo 'Copying new build'
         cp -f -a . /usr/share/nginx/quasar/latest
 
