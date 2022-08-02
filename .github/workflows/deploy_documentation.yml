@@ -8,9 +8,6 @@ on:
       - master
       - feat-agrupate-ymls
       - dev*
-env:
-  VERSION_NAME: ${{ if github.event.release.tag_name != '' then github.event.release.tag_name else github.event.release.ref_name != '' then github.event.release.ref_name else 'latest' end }}
-
 
 jobs:
   build_deploy:
@@ -19,7 +16,18 @@ jobs:
     runs-on: self-hosted
 
     steps:
+    - name: Define version
+      run: |
+        if [[$${{ starsWith(github.ref_name, "dev") }} ]]; then
+          echo "VERSION_NAME=${{ github.ref_name }}" >> "$GITHUB_ENV"
+        if [[$${{ starsWith(github.ref_name, "feat-agrupate-ymls") }} ]]; then
+          echo "VERSION_NAME=${{ github.ref_name }}" >> "$GITHUB_ENV"
+        if [[$${{ github.event.release.tag_name }} ]]; then
+          echo "VERSION_NAME=${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
+        else
+          echo "VERSION_NAME=latest" >> "$GITHUB_ENV"
+        fi
     - name: Show version
       run: |
-        echo "Deploying version: ${{ env.VERSION_NAME }}"
-        exit 1
+        echo ${{ env.VERSION_NAME }}
+
