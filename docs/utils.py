@@ -4,7 +4,7 @@ import pypandoc
 from pathlib import Path
 
 str_dict = {
-  'WEB_URL': 'http://128.141.204.240',
+  'WEB_URL': 'http://188.185.14.110',
   'REPO_URL': 'https://raw.githubusercontent.com/parasxos/quasar/master/Documentation',
 }
 
