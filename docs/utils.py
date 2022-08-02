@@ -183,7 +183,7 @@ def update_index(html_files, external_files, note_files, current_versions, versi
   with open('./docs/source/converted/quasar.rst', 'r') as f:
     quasar_lines = f.readlines()
     for idx, line in enumerate(quasar_lines):
-      if line == 'Quasar' and '=' in quasar_lines[idx + 1]:
+      if 'Quasar' in line and '=' in quasar_lines[idx + 1]:
         line = f'Quasar {version_name}\n'
       quasar_lines[idx] = update_ref(line)
 
