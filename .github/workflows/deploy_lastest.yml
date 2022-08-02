@@ -25,7 +25,6 @@ jobs:
         pip3 install --user -r requirements.txt
     - name: Parse legacy documentation
       run: |
-        whoami
         cd "${GITHUB_WORKSPACE}/"
         ls -l ./docs/
         python3 ./docs/html2rst.py
@@ -35,10 +34,8 @@ jobs:
         make html
     - name: Update server
       run: |
-        whoami
         echo 'Change dir location to build html'
         cd "${GITHUB_WORKSPACE}/docs/build/html"
-        ls -l
 
         echo 'Removing old build'
         rm -rf /home/fmagalla/quasar/latest
@@ -50,12 +47,9 @@ jobs:
 
         echo 'Copying new build to local'
         cp -a . /home/fmagalla/quasar/latest/
+        
         echo 'Copying to nginx folder'
         sudo cp -r /home/fmagalla/quasar/latest /usr/share/nginx/quasar
 
         echo 'Reloading nginx'
         echo Enma19624 | sudo -S nginx -s reload
-
-#        ls -l /afs/cern.ch/user/f/fmagalla/quasar/latest
-#        echo xx | sudo -S cp -f -a ./html/ /usr/share/nginx/quasar/latest
-#        echo xx | sudo -S chmod -R 660 . && chmod -R 660 /usr/share/nginx/quasar/latest/ 
