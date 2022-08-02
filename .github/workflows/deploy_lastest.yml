@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - feat-move-files-config
   workflow_run:
     workflows: [ "Deploy new release" ]
     types:

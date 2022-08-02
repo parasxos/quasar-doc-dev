@@ -43,7 +43,7 @@ jobs:
 
         echo 'Creating new build'
         mkdir -p /home/fmagalla/quasar/${{ github.ref_name }}
-        mkdir -p /usr/share/nginx/quasar/${{ github.ref_name }}
+        echo Enma19624 | sudo -S mkdir -p /usr/share/nginx/quasar/${{ github.ref_name }}
 
         echo 'Copying new build to local'
         cp -a . /home/fmagalla/quasar/${{ github.ref_name }}/

@@ -41,7 +41,7 @@ jobs:
 
         echo 'Creating new build'
         mkdir -p /home/fmagalla/quasar/${{ github.event.release.tag_name }}
-        mkdir -p /usr/share/nginx/quasar/${{ github.event.release.tag_name }}
+        echo Enma19624 | sudo -S mkdir -p /usr/share/nginx/quasar/${{ github.event.release.tag_name }}
 
         echo 'Copying new build to local'
         cp -a . /home/fmagalla/quasar/${{ github.event.release.tag_name }}/
