@@ -28,7 +28,7 @@ jobs:
         whoami
         cd "${GITHUB_WORKSPACE}/"
         ls -l ./docs/
-        python3 ./docs/html2rst.py
+        echo Enma19624 | sudo -S python3 ./docs/html2rst.py
     - name: Build documentation
       run: |
         cd "${GITHUB_WORKSPACE}/docs"
@@ -41,13 +41,17 @@ jobs:
         ls -l
 
         echo 'Removing old build'
+        rm -rf /home/fmagalla/quasar/latest
         echo Enma19624 | sudo -S rm -rf /usr/share/nginx/quasar/latest
 
         echo 'Creating new build'
+        mkdir -p /home/fmagalla/quasar/latest
         echo Enma19624 | sudo -S mkdir -p /usr/share/nginx/quasar/latest
 
-        echo 'Copying new build'
-        cp -f -a . /usr/share/nginx/quasar/latest
+        echo 'Copying new build to local'
+        cp -a . /home/fmagalla/quasar/latest/
+        echo 'Copying to nginx folder'
+        sudo cp -r /home/fmagalla/quasar/latest /usr/share/nginx/quasar
 
         echo 'Reloading nginx'
         echo Enma19624 | sudo -S nginx -s reload
