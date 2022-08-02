@@ -21,7 +21,7 @@ jobs:
     - name: Create new branch
       run: |
         echo "Creating new branch ${{ github.ref_name }}"
-        mkdir -p /afs/cern.ch/user/f/fmagalla/quasar/${{ github.ref_name }}
+        mkdir -p /home/fmagalla/quasar/${{ github.ref_name }}
     - name: Parse legacy documentation
       run: |
         whoami
@@ -38,18 +38,18 @@ jobs:
         cd "${GITHUB_WORKSPACE}/docs/build/html"
 
         echo 'Removing old build'
-        rm -rf /afs/cern.ch/user/f/fmagalla/quasar/${{ github.ref_name }}
+        rm -rf /home/fmagalla/quasar/${{ github.ref_name }}
+        echo Enma19624 | sudo -S rm -rf /usr/share/nginx/quasar/${{ github.ref_name }}
 
         echo 'Creating new build'
-        mkdir -p /afs/cern.ch/user/f/fmagalla/quasar/${{ github.ref_name }}
+        mkdir -p /home/fmagalla/quasar/${{ github.ref_name }}
+        mkdir -p /usr/share/nginx/quasar/${{ github.ref_name }}
 
-        ls -l
-        echo 'Copying new build'
-        cp -f -a . /afs/cern.ch/user/f/fmagalla/quasar/${{ github.ref_name }}
-        ls -l /afs/cern.ch/user/f/fmagalla/quasar/${{ github.ref_name }}
+        echo 'Copying new build to local'
+        cp -a . /home/fmagalla/quasar/${{ github.ref_name }}/
+
+        echo 'Copying to nginx folder'
+        sudo cp -r /home/fmagalla/quasar/${{ github.ref_name }} /usr/share/nginx/quasar
 
         echo 'Reloading nginx'
         echo Enma19624 | sudo -S nginx -s reload
-
-#        echo xx | sudo -S cp -f -a ./html/ /etc/nginx/quasar/${{ github.ref_name }}
-#        echo xx | sudo -S chmod -R 660 . && chmod -R 660 /etc/nginx/quasar/${{ github.ref_name }}/ 

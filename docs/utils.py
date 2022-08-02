@@ -9,7 +9,7 @@ str_dict = {
 }
 
 HOME_PATH = str(Path.home())
-VERSIONS_PATH = os.path.join(HOME_PATH, 'quasar')
+VERSIONS_PATH = '/home/fmagalla/quasar/'
 
 def get_files(in_path, external_extensions = []):
   html_files = []

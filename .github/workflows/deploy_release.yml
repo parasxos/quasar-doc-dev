@@ -20,10 +20,9 @@ jobs:
     - name: Create new release
       run: |
         echo "Creating new release ${{ github.event.release.tag_name }}"
-        mkdir -p /afs/cern.ch/user/f/fmagalla/quasar/${{ github.event.release.tag_name }}
+        mkdir -p /home/fmagalla/quasar/${{ github.event.release.tag_name }}
     - name: Parse legacy documentation
       run: |
-        whoami
         cd "${GITHUB_WORKSPACE}/"
         ls -l ./docs/
         python3 ./docs/html2rst.py
@@ -37,18 +36,18 @@ jobs:
         cd "${GITHUB_WORKSPACE}/docs/build/html"
 
         echo 'Removing old build'
-        rm -rf /afs/cern.ch/user/f/fmagalla/quasar/${{ github.event.release.tag_name }}
+        rm -rf /home/fmagalla/quasar/${{ github.event.release.tag_name }}
+        echo Enma19624 | sudo -S rm -rf /usr/share/nginx/quasar/${{ github.event.release.tag_name }}
 
         echo 'Creating new build'
-        mkdir -p /afs/cern.ch/user/f/fmagalla/quasar/${{ github.event.release.tag_name }}
+        mkdir -p /home/fmagalla/quasar/${{ github.event.release.tag_name }}
+        mkdir -p /usr/share/nginx/quasar/${{ github.event.release.tag_name }}
 
-        ls -l
-        echo 'Copying new build'
-        cp -f -a . /afs/cern.ch/user/f/fmagalla/quasar/${{ github.event.release.tag_name }}
-        ls -l /afs/cern.ch/user/f/fmagalla/quasar/${{ github.event.release.tag_name }}
+        echo 'Copying new build to local'
+        cp -a . /home/fmagalla/quasar/${{ github.event.release.tag_name }}/
+        
+        echo 'Copying to nginx folder'
+        sudo cp -r /home/fmagalla/quasar/${{ github.event.release.tag_name }} /usr/share/nginx/quasar
 
         echo 'Reloading nginx'
         echo Enma19624 | sudo -S nginx -s reload
-
-#        echo xx | sudo -S cp -f -a ./html/ /etc/nginx/quasar/${{ github.event.release.tag_name }}
-#        echo xx | sudo -S chmod -R 660 . && chmod -R 660 /etc/nginx/quasar/${{ github.event.release.tag_name }}/ 

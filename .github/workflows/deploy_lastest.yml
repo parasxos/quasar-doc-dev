@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - feat-move-files-config
   workflow_run:
     workflows: [ "Deploy new release" ]
     types:
@@ -24,7 +25,6 @@ jobs:
         pip3 install --user -r requirements.txt
     - name: Parse legacy documentation
       run: |
-        whoami
         cd "${GITHUB_WORKSPACE}/"
         ls -l ./docs/
         python3 ./docs/html2rst.py
@@ -38,18 +38,18 @@ jobs:
         cd "${GITHUB_WORKSPACE}/docs/build/html"
 
         echo 'Removing old build'
-        rm -rf /afs/cern.ch/user/f/fmagalla/quasar/latest
+        rm -rf /home/fmagalla/quasar/latest
+        echo Enma19624 | sudo -S rm -rf /usr/share/nginx/quasar/latest
 
         echo 'Creating new build'
-        mkdir -p /afs/cern.ch/user/f/fmagalla/quasar/latest
+        mkdir -p /home/fmagalla/quasar/latest
+        echo Enma19624 | sudo -S mkdir -p /usr/share/nginx/quasar/latest
 
-        ls -l
-        echo 'Copying new build'
-        cp -f -a . /afs/cern.ch/user/f/fmagalla/quasar/latest
-        ls -l /afs/cern.ch/user/f/fmagalla/quasar/latest
+        echo 'Copying new build to local'
+        cp -a . /home/fmagalla/quasar/latest/
+        
+        echo 'Copying to nginx folder'
+        sudo cp -r /home/fmagalla/quasar/latest /usr/share/nginx/quasar
 
         echo 'Reloading nginx'
         echo Enma19624 | sudo -S nginx -s reload
-
-#        echo xx | sudo -S cp -f -a ./html/ /etc/nginx/quasar/latest
-#        echo xx | sudo -S chmod -R 660 . && chmod -R 660 /etc/nginx/quasar/latest/ 
