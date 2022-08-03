@@ -4,7 +4,7 @@ import pypandoc
 from pathlib import Path
 
 str_dict = {
-  'WEB_URL': 'http://188.185.14.110',
+  'WEB_URL': 'http://quasar.cern.ch',
   'REPO_URL': 'https://raw.githubusercontent.com/parasxos/quasar/master/Documentation',
 }
 
@@ -204,7 +204,7 @@ def update_index(html_files, external_files, note_files, current_versions, versi
 
   print('\tInserting versions')
   idx_versions = find_line('Documentation versions', gap=3, start=idx_ext, lines=lines)
-  format_str = '- `{clean_name} <{WEB_URL}/{filename}/>`_\n'
+  format_str = '- `{clean_name} <{WEB_URL}/version/{filename}/>`_\n'
   idx_versions, lines = insert_files(idx_versions, format_str, current_versions, lines, exceptions, str_dict)
 
   print('\n'.join(lines))
