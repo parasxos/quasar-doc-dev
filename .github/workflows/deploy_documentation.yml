@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - master
-      - feat-agrupate-ymls
       - dev*
 
 jobs:
@@ -59,11 +58,11 @@ jobs:
 
         echo 'Removing old build'
         rm -rf /home/fmagalla/quasar/${{ env.VERSION_NAME }}
-        echo Enma19624 | sudo -S rm -rf /usr/share/nginx/quasar/${{ env.VERSION_NAME }}
+        echo ${{ secrets.PASS_USER }} | sudo -S rm -rf /usr/share/nginx/quasar/${{ env.VERSION_NAME }}
 
         echo 'Creating new build'
         mkdir -p /home/fmagalla/quasar/${{ env.VERSION_NAME }}
-        echo Enma19624 | sudo -S mkdir -p /usr/share/nginx/quasar/${{ env.VERSION_NAME }}
+        echo ${{ secrets.PASS_USER }} | sudo -S mkdir -p /usr/share/nginx/quasar/${{ env.VERSION_NAME }}
 
         echo 'Copying new build to local'
         cp -a . /home/fmagalla/quasar/${{ env.VERSION_NAME }}/
@@ -72,4 +71,4 @@ jobs:
         sudo cp -r /home/fmagalla/quasar/${{ env.VERSION_NAME }} /usr/share/nginx/quasar
 
         echo 'Reloading nginx'
-        echo Enma19624 | sudo -S nginx -s reload
+        echo ${{ secrets.PASS_USER }} | sudo -S nginx -s reload
