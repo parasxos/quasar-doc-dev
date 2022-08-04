@@ -115,7 +115,8 @@ def parse_raw_html(filename, html_path, output_path, extract_content_type = None
     filename = os.path.splitext(filename)[0]
     f.write(f'{clean_filename(filename)}\n=========\n\n')
     f.write('.. raw:: html\n\n')
-    f.writelines(content.split('\n'))
+    for line in content.split('\n'):
+      f.write(f'\t{line}\n')
 
 def parse_html_files(files, html_path, output_path, raw_html=['ChangeLog.html', 'quasar_opcua_servers.html']):
   print('Starting conversion')
