@@ -10,7 +10,8 @@ str_dict = {
 }
 
 raw_contents_types = {
-  'ChangeLog.html': 'table'
+  'ChangeLog.html': 'table',
+  'quasar_opcua_servers.html': 'table'
 }
 
 HOME_PATH = str(Path.home())
@@ -100,7 +101,15 @@ def parse_raw_html(filename, html_path, output_path, extract_content_type = None
     if idx_start_body == -1 or idx_end_body == -1:
       print('\t\tNo table found')
       return
-    content = content[idx_start_body: idx_end_body]
+  else:
+    idx_start_body = content.find('<body')
+    idx_end_body = content.find('</body>') + 7
+
+    if idx_start_body == -1 or idx_end_body == -1:
+      print('\t\tNo body found')
+      return
+
+  content = content[idx_start_body: idx_end_body]
 
   with open(output_path, 'w') as f:
     filename = os.path.splitext(filename)[0]
