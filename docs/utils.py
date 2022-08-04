@@ -16,7 +16,7 @@ def download_list_known_server(url, output_path):
   print(f'Downloading {url}')
   r = requests.get(url)
   with open(f'{output_path}/quasar_opcua_servers.html', 'w') as f:
-    f.write(r.content)
+    f.write(r.text)
 
 def get_files(in_path, external_extensions = []):
   html_files = []
