@@ -2,13 +2,13 @@
   "default-branch": "latest",
   "versions": [
     "latest",
-    "1.7.5"
+    "1.7.6"
   ],
   "labels": {
     "latest": "Latest"
   },
   "warnings": {
-    "1.7.5": ["outdated"]
+    "1.7.6": ["outdated"]
   },
   "latest": "latest",
   "downloads": {

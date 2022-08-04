@@ -157,7 +157,13 @@ function _addVersionsMenu(version_data) {
 }
 
 function addVersionsMenu() {
-  var json_file = window.location.href + '/_static/versions.json';
+  var current_url = ''
+  if (window.location.href.includes('version')) {
+    current_url = window.location.href.split('/').slice(0, 5).join('/');
+  } else {
+    current_url = window.location.href;
+  }
+  var json_file = current_url + '/_static/versions.json';
   $.getJSON(json_file, _addVersionsMenu);
 }
 
