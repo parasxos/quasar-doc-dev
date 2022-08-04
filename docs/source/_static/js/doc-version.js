@@ -61,7 +61,7 @@ function _addVersionsMenu(version_data) {
     } else {
       var url_version = '';
       if (!current_url.includes('version')) {
-        url_version = current_url + 'version/' + folder;
+        url_version = current_url + '/version/' + folder;
       } else {
         if (folder == 'latest') {
           url_version = window.location.origin;
