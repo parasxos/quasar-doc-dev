@@ -105,7 +105,7 @@ def parse_raw_html(filename, html_path, output_path, extract_content_type = None
 
   with open(output_path, 'w') as f:
     filename = os.path.splitext(filename)[0]
-    f.write(f'{filename.replace('_', ' ')}\n=========\n\n')
+    f.write(f'{filename.replace("_", " ")}\n=========\n\n')
     f.write('.. raw:: html\n\n')
     for line in content.split('\n'):
       f.write(f'\t{line}\n')
