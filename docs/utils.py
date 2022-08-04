@@ -15,12 +15,12 @@ raw_contents_types = {
 
 HOME_PATH = str(Path.home())
 VERSIONS_PATH = '/home/fmagalla/quasar/'
-EXCEPTION_INDEX = [ 'quasar OPC UA servers.html' ] 
+EXCEPTION_INDEX = [ 'quasar_OPC_UA_servers.html' ] 
 
 def download_list_known_server(url, output_path):
   print(f'Downloading {url}')
   r = requests.get(url)
-  with open(f'{output_path}/quasar OPC UA servers.html', 'w') as f:
+  with open(f'{output_path}/quasar_OPC_UA_servers.html', 'w') as f:
     f.write(r.text)
 
 def get_files(in_path, external_extensions = []):
@@ -105,7 +105,7 @@ def parse_raw_html(filename, html_path, output_path, extract_content_type = None
 
   with open(output_path, 'w') as f:
     filename = os.path.splitext(filename)[0]
-    f.write(f'{clean_filename(filename)}\n=========\n\n')
+    f.write(f'{filename.replace('_', ' ')}\n=========\n\n')
     f.write('.. raw:: html\n\n')
     for line in content.split('\n'):
       f.write(f'\t{line}\n')
