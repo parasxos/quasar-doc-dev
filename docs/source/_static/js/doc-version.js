@@ -71,7 +71,7 @@ function _addVersionsMenu(version_data) {
         "<dd><a href='" +
         url_version +
         "'>" +
-        version_data['labels'][folder] +
+        version_data['labels'][folder] || folder +
         '</a></dd>';
     }
   }
