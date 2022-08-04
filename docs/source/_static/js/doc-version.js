@@ -26,6 +26,7 @@ function _addVersionsMenu(version_data) {
   // The menu was reverse-engineered from the RTD websites, so it's very
   // specific to the sphinx_rtd_theme
   var folders = version_data['versions'];
+  console.log('folders', folders);
   var root_url = getRootUrl();
   var current_url = document.URL;
   var current_folder = getGhPagesCurrentFolder();
@@ -66,6 +67,7 @@ function _addVersionsMenu(version_data) {
       } else {
         url_version = current_url.replace(current_folder, folder);
       }
+      console.log(version_data['labels'][folder] || folder, folder, version_data['labels'][folder])
       var inner_html =
         inner_html +
         "<dd><a href='" +
