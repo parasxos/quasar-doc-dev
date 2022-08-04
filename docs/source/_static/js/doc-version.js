@@ -29,6 +29,7 @@ function _addVersionsMenu(version_data) {
   var root_url = getRootUrl();
   var current_url = document.URL;
   var current_folder = getGhPagesCurrentFolder();
+  console.log('current_folder', current_folder);
   var current_version = version_data['labels'][current_folder];
   var menu = document.createElement('div');
   menu.setAttribute('class', 'rst-versions');
@@ -59,7 +60,6 @@ function _addVersionsMenu(version_data) {
         current_version +
         '</a></dd></strong>';
     } else {
-      var folder_url = folder == 'latest' ? folder : 'versions/' + folder;
       var url_version = '';
       if (!current_url.includes('versions')) {
         url_version = current_url + 'version/' + folder;
