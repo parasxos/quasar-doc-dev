@@ -23,7 +23,6 @@ function getGithubProjectUrl() {
 }
 
 function _addVersionsMenu(version_data) {
-  console.log('version_data', version_data);
   // The menu was reverse-engineered from the RTD websites, so it's very
   // specific to the sphinx_rtd_theme
   var folders = version_data['versions'];
@@ -51,7 +50,6 @@ function _addVersionsMenu(version_data) {
   var i;
   for (i in folders) {
     var folder = folders[i];
-    console.log('folder', folder);
     if (folder == current_folder) {
       var inner_html =
         inner_html +
@@ -62,11 +60,9 @@ function _addVersionsMenu(version_data) {
         '</a></dd></strong>';
     } else {
       var folder_url = folder == 'latest' ? folder : 'versions/' + folder;
-      console.log('Current folder', current_folder);
-      console.log('Folder URL', folder_url);
       var url_version = '';
       if (!current_url.includes('versions')) {
-        url_version = current_url + 'versions/' + folder;
+        url_version = current_url + 'version/' + folder;
       } else {
         url_version = current_url.replace(current_folder, folder);
       }
