@@ -15,11 +15,12 @@ raw_contents_types = {
 
 HOME_PATH = str(Path.home())
 VERSIONS_PATH = '/home/fmagalla/quasar/'
+EXCEPTION_INDEX = [ 'quasar OPC UA servers.html' ] 
 
 def download_list_known_server(url, output_path):
   print(f'Downloading {url}')
   r = requests.get(url)
-  with open(f'{output_path}/quasar_opcua_servers.html', 'w') as f:
+  with open(f'{output_path}/quasar OPC UA servers.html', 'w') as f:
     f.write(r.text)
 
 def get_files(in_path, external_extensions = []):
@@ -170,6 +171,8 @@ def find_line(target, gap = 1, start = 0, lines = []):
 
 def insert_files(idx = 0, format_str = '', files = [], lines = [], exceptions = [], str_kwargs = {}, is_rst=False):
   for idx_cur, filename in enumerate(files):
+    if filename in EXCEPTION_INDEX:
+      continue
     if is_rst:
       filename = os.path.splitext(filename)[0]
       clean_name = clean_filename(os.path.splitext(filename)[0], exceptions)
@@ -181,7 +184,7 @@ def insert_files(idx = 0, format_str = '', files = [], lines = [], exceptions = 
   return idx, lines
 
 
-def update_index(html_files, external_files, note_files, current_versions, version_name, path_index, exceptions = []):
+def update_index(html_files, external_files, note_files, current_versions, version_name, path_index, exceptions_clean = []):
   print('Updating index.rst')
 
   with open(path_index.replace('index', '_init_index'), 'r') as f:
@@ -199,7 +202,7 @@ def update_index(html_files, external_files, note_files, current_versions, versi
   print(f'\tInserting html files')
   idx_html = find_line('HTML documentation', gap=3, lines=lines)
   format_str = '\t\t{clean_name} <./converted/{filename}>\n'
-  idx_html, lines = insert_files(idx_html, format_str, html_files, lines, exceptions, is_rst=True)
+  idx_html, lines = insert_files(idx_html, format_str, html_files, lines, exceptions_clean, is_rst=True)
 
 
   rst_add_files = ['external_files.rst', 'notes_files.rst']
@@ -207,12 +210,12 @@ def update_index(html_files, external_files, note_files, current_versions, versi
   print(f'\tInserting additional files')
   idx_ext = find_line('Additional files', gap=3, start=idx_html, lines=lines)
   format_str = '\t{clean_name} <./{filename}>\n'
-  idx_ext, lines = insert_files(idx_ext, format_str, rst_add_files, lines, exceptions, is_rst=True)
+  idx_ext, lines = insert_files(idx_ext, format_str, rst_add_files, lines, exceptions_clean, is_rst=True)
 
   print('\tInserting versions')
   idx_versions = find_line('Documentation versions', gap=3, start=idx_ext, lines=lines)
   format_str = '- `{clean_name} <{WEB_URL}/version/{filename}/>`_\n'
-  idx_versions, lines = insert_files(idx_versions, format_str, current_versions, lines, exceptions, str_dict)
+  idx_versions, lines = insert_files(idx_versions, format_str, current_versions, lines, exceptions_clean, str_dict)
 
   print('\n'.join(lines))
 
@@ -227,7 +230,7 @@ def update_index(html_files, external_files, note_files, current_versions, versi
   print(f'\tInserting external files')
   idx_note = find_line('External files', gap=3, lines=lines)
   format_str = '- `{clean_name} <{REPO_URL}/{filename}>`_\n'
-  idx_note, lines = insert_files(idx_note, format_str, external_files, lines, exceptions, str_dict)
+  idx_note, lines = insert_files(idx_note, format_str, external_files, lines, exceptions_clean, str_dict)
 
   with open(path_index.replace('index', 'external_files'), 'w') as f:
     f.writelines(lines)
@@ -240,7 +243,7 @@ def update_index(html_files, external_files, note_files, current_versions, versi
   print(f'\tInserting notes files')
   idx_note = find_line('Notes', gap=3, lines=lines)
   format_str = '- `{clean_name} <{REPO_URL}/Notes/{filename}>`_\n'
-  idx_note, lines = insert_files(idx_note, format_str, note_files, lines, exceptions, str_dict)
+  idx_note, lines = insert_files(idx_note, format_str, note_files, lines, exceptions_clean, str_dict)
 
   with open(path_index.replace('index', 'notes_files'), 'w') as f:
     f.writelines(lines)
