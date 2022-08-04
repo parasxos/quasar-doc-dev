@@ -1,5 +1,6 @@
 import os
 import re
+import requests
 import pypandoc
 from pathlib import Path
 
@@ -10,6 +11,12 @@ str_dict = {
 
 HOME_PATH = str(Path.home())
 VERSIONS_PATH = '/home/fmagalla/quasar/'
+
+def download_list_known_server(url, output_path):
+  print(f'Downloading {url}')
+  r = requests.get(url)
+  with open(output_path, 'w') as f:
+    f.write(r.content)
 
 def get_files(in_path, external_extensions = []):
   html_files = []
@@ -98,7 +105,7 @@ def parse_raw_html(filename, html_path, output_path):
     for line in content.split('\n'):
       f.write(f'\t{line}\n')
 
-def parse_html_files(files, html_path, output_path, raw_html=['ChangeLog.html']):
+def parse_html_files(files, html_path, output_path, raw_html=['ChangeLog.html', 'quasar_opcua_servers.html']):
   print('Starting conversion')
 
   files_processed = 0
