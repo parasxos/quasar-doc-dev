@@ -6,7 +6,7 @@ function getGhPagesCurrentFolder() {
   const {
     location: { pathname = '' },
   } = window;
-  if (pathname.includes('versions/')) {
+  if (pathname.includes('version')) {
     const [, version, ..._] = pathname.split('/');
     return version;
   }
