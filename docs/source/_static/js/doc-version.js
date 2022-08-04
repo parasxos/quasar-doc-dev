@@ -63,7 +63,11 @@ function _addVersionsMenu(version_data) {
       if (!current_url.includes('version')) {
         url_version = current_url + 'version/' + folder;
       } else {
-        url_version = current_url.replace(current_folder, folder);
+        if (folder == 'latest') {
+          url_version = window.location.origin;
+        } else {
+          url_version = current_url.replace(current_folder, folder);
+        }
       }
       var inner_html =
         inner_html +
