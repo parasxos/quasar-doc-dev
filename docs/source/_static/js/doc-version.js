@@ -13,9 +13,10 @@ function getGhPagesCurrentFolder() {
   return 'latest';
 }
 
-function getRootUrl() {
-  var root_url = window.location.origin;
-  return root_url;
+function getCurrentUrl() {
+  var idx_path = window.location.href.includes('version') ? 5 : 3;
+  var current_url = window.location.href.split('/').slice(0, idx_path).join('/');
+  return current_url;
 }
 
 function getGithubProjectUrl() {
@@ -26,8 +27,7 @@ function _addVersionsMenu(version_data) {
   // The menu was reverse-engineered from the RTD websites, so it's very
   // specific to the sphinx_rtd_theme
   var folders = version_data['versions'];
-  var root_url = getRootUrl();
-  var current_url = document.URL;
+  var current_url = getCurrentUrl();
   var current_folder = getGhPagesCurrentFolder();
   var current_version = version_data['labels'][current_folder] || current_folder;
   var menu = document.createElement('div');
@@ -157,10 +157,7 @@ function _addVersionsMenu(version_data) {
 }
 
 function addVersionsMenu() {
-  var idx_path = window.location.href.includes('version') ? 5 : 3;
-  var current_url = window.location.href.split('/').slice(0, idx_path).join('/');
-
-  var json_file = current_url + '/_static/versions.json';
+  var json_file = getCurrentUrl() + '/_static/versions.json';
   $.getJSON(json_file, _addVersionsMenu);
 }
 
