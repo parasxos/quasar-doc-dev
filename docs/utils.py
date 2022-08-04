@@ -15,7 +15,7 @@ VERSIONS_PATH = '/home/fmagalla/quasar/'
 def download_list_known_server(url, output_path):
   print(f'Downloading {url}')
   r = requests.get(url)
-  with open(output_path, 'w') as f:
+  with open(f'{output_path}/quasar_opcua_servers.html', 'w') as f:
     f.write(r.content)
 
 def get_files(in_path, external_extensions = []):
