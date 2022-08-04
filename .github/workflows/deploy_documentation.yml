@@ -40,21 +40,15 @@ jobs:
         echo "Creating new folder ${{ env.VERSION_NAME }}"
         mkdir -p /home/fmagalla/quasar/${{ env.VERSION_NAME }}
 
-    - name: Parse legacy documentation
-      run: |
-        cd "${GITHUB_WORKSPACE}/"
-        ls -l ./docs/
-        python3 ./docs/html2rst.py ${{ env.VERSION_NAME }}
-
     - name: Build documentation
       run: |
         cd "${GITHUB_WORKSPACE}/docs"
-        make html
-    
+        sphinx-build -b html ./source ./_build/${{ env.VERSION_NAME }}
+
     - name: Update server
       run: |
         echo 'Change directory location to build html'
-        cd "${GITHUB_WORKSPACE}/docs/build/html"
+        cd "${GITHUB_WORKSPACE}/docs/_build/${{ env.VERSION_NAME }}"
 
         echo 'Removing old build'
         rm -rf /home/fmagalla/quasar/${{ env.VERSION_NAME }}
@@ -66,7 +60,7 @@ jobs:
 
         echo 'Copying new build to local'
         cp -a . /home/fmagalla/quasar/${{ env.VERSION_NAME }}/
-        
+
         echo 'Copying to nginx folder'
         sudo cp -r /home/fmagalla/quasar/${{ env.VERSION_NAME }} /usr/share/nginx/quasar
 

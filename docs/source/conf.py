@@ -51,10 +51,12 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 html_logo = "_static/quasar_logo.png"
 
-html_css_files = ['default.css']
+html_css_files = [
+  'css/default.css'
+]
 
 html_js_files = [
-  'doc-version.js',
+  'js/doc-version.js',
 ]
 
 locale_dirs = ['../locales']

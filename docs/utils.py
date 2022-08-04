@@ -165,7 +165,7 @@ def insert_files(idx = 0, format_str = '', files = [], lines = [], exceptions = 
   return idx, lines
 
 
-def update_index(html_files, external_files, note_files, current_versions, path_index, exceptions_clean = []):
+def update_index(html_files, external_files, note_files, path_index, exceptions_clean = []):
   print('Updating index.rst')
 
   with open(path_index.replace('index', '_init_index'), 'r') as f:

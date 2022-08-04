@@ -1,0 +1,19 @@
+{
+  "default-branch": "latest",
+  "versions": [
+    "latest",
+    "1.6.9"
+  ],
+  "labels": {
+    "latest": "Latest",
+    "1.6.9": "1.6.9"
+  },
+  "warnings": {
+    "1.6.9": ["outdated"]
+  },
+  "latest": "1.6.9",
+  "downloads": {
+    "latest": [],
+    "test": []
+  }
+}

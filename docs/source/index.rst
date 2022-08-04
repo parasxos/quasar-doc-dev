@@ -9,6 +9,9 @@ Quasar
 | Primary contact: quasar-developers@cern.ch
 
 
+--------------
+
+
 .. toctree::
    :caption: HTML documentation
 
@@ -41,8 +44,3 @@ Quasar
 
    Summary of known quasar-based OPC-UA servers <./converted/quasar_OPC_UA_servers>
 
-
-
-
-Documentation versions
-======================
