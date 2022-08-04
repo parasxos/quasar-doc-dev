@@ -9,6 +9,10 @@ str_dict = {
   'REPO_URL': 'https://raw.githubusercontent.com/parasxos/quasar/master/Documentation',
 }
 
+raw_contents_types = {
+  'ChangeLog.html': 'table'
+}
+
 HOME_PATH = str(Path.home())
 VERSIONS_PATH = '/home/fmagalla/quasar/'
 
@@ -83,27 +87,26 @@ def clean_filename(string, exceptions = []):
   return string.capitalize()
 
 
-def parse_raw_html(filename, html_path, output_path):
+def parse_raw_html(filename, html_path, output_path, extract_content_type = None):
   print('\t\tParsing raw html')
 
   with open(html_path, 'r') as f:
     content = f.read()
   
-  idx_start_body = content.find('<table')
-  idx_end_body = content.find('</table>') + 8
+  if extract_content_type == 'table':
+    idx_start_body = content.find('<table')
+    idx_end_body = content.find('</table>') + 8
 
-  if idx_start_body == -1 or idx_end_body == -1:
-    print('\t\tNo table found')
-    return
-
-  content = content[idx_start_body: idx_end_body]
+    if idx_start_body == -1 or idx_end_body == -1:
+      print('\t\tNo table found')
+      return
+    content = content[idx_start_body: idx_end_body]
 
   with open(output_path, 'w') as f:
     filename = os.path.splitext(filename)[0]
-    f.write(f'{filename}\n=========\n\n')
+    f.write(f'{clean_filename(filename)}\n=========\n\n')
     f.write('.. raw:: html\n\n')
-    for line in content.split('\n'):
-      f.write(f'\t{line}\n')
+    f.writelines(content.split('\n'))
 
 def parse_html_files(files, html_path, output_path, raw_html=['ChangeLog.html', 'quasar_opcua_servers.html']):
   print('Starting conversion')
@@ -127,7 +130,7 @@ def parse_html_files(files, html_path, output_path, raw_html=['ChangeLog.html', 
         lines = content[:idx_first_h1] + '</h1>' + content_after
         f.write(lines)
     if file in raw_html:
-      parse_raw_html(file, in_path, out_path)
+      parse_raw_html(file, in_path, out_path, raw_contents_types.get(file))
     else:  
       rst = pypandoc.convert_file(in_path, 'rst', outputfile=out_path)
     files_processed += 1
