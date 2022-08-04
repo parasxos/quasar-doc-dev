@@ -53,7 +53,6 @@ def get_files(in_path, external_extensions = []):
 
   return html_files, external_files, note_files, current_versions
 
-
 def copy_external(html_path, output_path, extensions = []):
   if not os.path.exists(output_path):
     os.makedirs(output_path, exist_ok=True)
@@ -67,7 +66,6 @@ def copy_external(html_path, output_path, extensions = []):
 
   for image in os.listdir(f'{html_path}/images'):
     os.system(f'cp {html_path}/images/{image} {output_path}/images/{image}')
-
 
 def clean_filename(string, exceptions = []):
   if string in exceptions:
@@ -150,7 +148,6 @@ def update_ref(line):
   
   return line
 
-
 def find_line(target, gap = 1, start = 0, lines = []):
   idx_target = -1
   
@@ -159,7 +156,6 @@ def find_line(target, gap = 1, start = 0, lines = []):
       idx_target = idx + start + gap
       break
   return idx_target
-
 
 def insert_files(idx = 0, format_str = '', files = [], lines = [], exceptions = [], str_kwargs = {}, is_rst=False):
   for idx_cur, filename in enumerate(files):

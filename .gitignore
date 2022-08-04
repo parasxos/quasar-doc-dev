@@ -25,3 +25,4 @@ docs/source/converted
 .vscode/
 *.pkg
 .DS_Store
+__pycache__
