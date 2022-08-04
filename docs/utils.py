@@ -8,35 +8,18 @@ str_dict = {
   'WEB_URL': 'http://quasar.cern.ch',
   'REPO_URL': 'https://raw.githubusercontent.com/parasxos/quasar/master/Documentation',
 }
-
 raw_contents_types = {
   'ChangeLog.html': 'table'
 }
+exception_index = [
+  'quasar_OPC_UA_servers.html'
+]
 
-HOME_PATH = str(Path.home())
-VERSIONS_PATH = '/home/fmagalla/quasar/'
-EXCEPTION_INDEX = [ 'quasar_OPC_UA_servers.html' ] 
-
-def download_list_known_server(url, output_path):
-  print(f'Downloading {url}')
-  r = requests.get(url)
-  with open(f'{output_path}/quasar_OPC_UA_servers.html', 'w') as f:
-    f.write(r.text)
 
 def get_files(in_path, external_extensions = []):
   html_files = []
   note_files = []
   external_files = []
-  current_versions = []
-
-  try:
-    folder_versions = os.listdir(VERSIONS_PATH)
-  except:
-    folder_versions = []
-
-  for folder_version in folder_versions:
-    if os.path.exists(os.path.join(VERSIONS_PATH, folder_version)):
-      current_versions.append(folder_version)
 
   for filename in os.listdir(in_path):
     extension = os.path.splitext(filename)[1]
@@ -49,21 +32,19 @@ def get_files(in_path, external_extensions = []):
   for filename in os.listdir(f'{in_path}/Notes'):
     note_files.append(filename)
 
-  current_versions.sort(key=lambda x: x.lower(), reverse=True)
   html_files.sort(key=lambda x: x.lower())
   note_files.sort(key=lambda x: x.lower())
   external_files.sort(key=lambda x: x.lower())
 
   print(
     f"""
-    Found {len(current_versions)} versions: {current_versions}
     Found {len(html_files)} html files
     Found {len(note_files)} note files
     Found {len(external_files)} external files
     """
   )
 
-  return html_files, external_files, note_files, current_versions
+  return html_files, external_files, note_files
 
 def copy_external(html_path, output_path, extensions = []):
   if not os.path.exists(output_path):
@@ -171,7 +152,7 @@ def find_line(target, gap = 1, start = 0, lines = []):
 
 def insert_files(idx = 0, format_str = '', files = [], lines = [], exceptions = [], str_kwargs = {}, is_rst=False):
   for idx_cur, filename in enumerate(files):
-    if filename in EXCEPTION_INDEX:
+    if filename in exception_index:
       continue
     if is_rst:
       filename = os.path.splitext(filename)[0]
@@ -184,20 +165,11 @@ def insert_files(idx = 0, format_str = '', files = [], lines = [], exceptions = 
   return idx, lines
 
 
-def update_index(html_files, external_files, note_files, current_versions, version_name, path_index, exceptions_clean = []):
+def update_index(html_files, external_files, note_files, current_versions, path_index, exceptions_clean = []):
   print('Updating index.rst')
 
   with open(path_index.replace('index', '_init_index'), 'r') as f:
     lines = f.readlines()
-
-  with open('./docs/source/converted/quasar.rst', 'r') as f:
-    quasar_lines = f.readlines()
-    for idx, line in enumerate(quasar_lines):
-      if 'Quasar' in line and '=' in quasar_lines[idx + 1]:
-        line = f'Quasar {version_name}\n'
-      quasar_lines[idx] = update_ref(line)
-
-  lines = quasar_lines + lines
 
   print(f'\tInserting html files')
   idx_html = find_line('HTML documentation', gap=3, lines=lines)
@@ -211,13 +183,6 @@ def update_index(html_files, external_files, note_files, current_versions, versi
   idx_ext = find_line('Additional files', gap=3, start=idx_html, lines=lines)
   format_str = '\t{clean_name} <./{filename}>\n'
   idx_ext, lines = insert_files(idx_ext, format_str, rst_add_files, lines, exceptions_clean, is_rst=True)
-
-  print('\tInserting versions')
-  idx_versions = find_line('Documentation versions', gap=3, start=idx_ext, lines=lines)
-  format_str = '- `{clean_name} <{WEB_URL}/version/{filename}/>`_\n'
-  idx_versions, lines = insert_files(idx_versions, format_str, current_versions, lines, exceptions_clean, str_dict)
-
-  print('\n'.join(lines))
 
   with open(path_index, 'w') as f:
     f.writelines(lines)
@@ -239,7 +204,7 @@ def update_index(html_files, external_files, note_files, current_versions, versi
   notes_path = path_index.replace('index', '_init_notes')
   with open(notes_path) as f:
     lines = f.readlines()
-  
+
   print(f'\tInserting notes files')
   idx_note = find_line('Notes', gap=3, lines=lines)
   format_str = '- `{clean_name} <{REPO_URL}/Notes/{filename}>`_\n'
