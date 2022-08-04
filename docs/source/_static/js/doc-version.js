@@ -157,12 +157,9 @@ function _addVersionsMenu(version_data) {
 }
 
 function addVersionsMenu() {
-  var current_url = ''
-  if (window.location.href.includes('version')) {
-    current_url = window.location.href.split('/').slice(0, 5).join('/');
-  } else {
-    current_url = window.location.href;
-  }
+  var idx_path = window.location.href.includes('version') ? 5 : 3;
+  var current_url = window.location.href.split('/').slice(0, idx_path).join('/');
+
   var json_file = current_url + '/_static/versions.json';
   $.getJSON(json_file, _addVersionsMenu);
 }
