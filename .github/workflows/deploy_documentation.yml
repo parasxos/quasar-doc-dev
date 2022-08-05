@@ -19,13 +19,14 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Set up @changed-files
+      id: changed-files-for-docs
       uses: tj-actions/changed-files@v24.1
       with:
         path: docs
     
     - name: Check if deployment is needed
       run: |
-        if [ ${{ steps.changed-files-specific.outputs.any_changed == 'true' }} ]; then
+        if [ ${{ steps.changed-files-for-docs.outputs.any_changed == 'true' }} ]; then
           echo "Deployment is needed"
         else
           echo "No deployment is needed"
