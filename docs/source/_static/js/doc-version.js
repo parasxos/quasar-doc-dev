@@ -83,7 +83,7 @@ function _addVersionsMenu(version_data) {
     }
   }
 
-  //var inner_html = inner_html + "<dt>Downloads</dt>";
+  var inner_html = inner_html + "<dt>Downloads</dt>";
   //var urlPDF = current_url + '/quasar.pdf';
   var urlEPUB = current_url + '/Quasar.epub';
   //var inner_html = inner_html + "<dd><a href='" + urlPDF + "'>PDF</a></dd>";
