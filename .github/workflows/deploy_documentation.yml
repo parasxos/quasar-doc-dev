@@ -18,6 +18,20 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Set up @changed-files
+      uses: tj-actions/changed-files@v24.1
+      with:
+        path: docs
+    
+    - name: Check if deployment is needed
+      run: |
+        if [ ${{ steps.changed-files-specific.outputs.any_changed == 'true' }} ]; then
+          echo "Deployment is needed"
+        else
+          echo "No deployment is needed"
+          exit 0
+        fi
+
     - name: Define version name
       run: |
         if [ ${{ startsWith(github.ref_name, 'dev') }} = true ]; then
