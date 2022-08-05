@@ -40,7 +40,7 @@ jobs:
         echo "Creating new folder ${{ env.VERSION_NAME }}"
         mkdir -p /home/fmagalla/quasar/${{ env.VERSION_NAME }}
 
-    - name: Build documentation HTML
+    - name: Build HTML documentation
       run: |
         cd "${GITHUB_WORKSPACE}/docs"
         sphinx-build -b html ./source ./_build/${{ env.VERSION_NAME }}
