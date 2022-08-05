@@ -66,14 +66,12 @@ jobs:
         rm -rf /home/fmagalla/quasar/${{ env.VERSION_NAME }}
         echo ${{ secrets.PASS_USER }} | sudo -S rm -rf /usr/share/nginx/quasar/${{ env.VERSION_NAME }}
 
-        echo 'Creating new build'
-        mkdir -p /home/fmagalla/quasar/${{ env.VERSION_NAME }}
-        echo ${{ secrets.PASS_USER }} | sudo -S mkdir -p /usr/share/nginx/quasar/${{ env.VERSION_NAME }}
-
         echo 'Copying new build to local'
+        mkdir -p /home/fmagalla/quasar/${{ env.VERSION_NAME }}
         cp -a . /home/fmagalla/quasar/${{ env.VERSION_NAME }}/
 
         echo 'Copying to nginx folder'
+        echo ${{ secrets.PASS_USER }} | sudo -S mkdir -p /usr/share/nginx/quasar/${{ env.VERSION_NAME }}
         sudo cp -r /home/fmagalla/quasar/${{ env.VERSION_NAME }} /usr/share/nginx/quasar
 
         echo 'Reloading nginx'
@@ -83,12 +81,10 @@ jobs:
       if: ${{ env.VERSION_NAME  == 'latest' }}
       run: |
         cd "${GITHUB_WORKSPACE}/docs/_build/${{ env.VERSION_NAME }}"
-        
+  
         echo 'Removing old build'
         echo ${{ secrets.PASS_USER }} | sudo -S rm -rf /eos/project-q/quasar/www
 
-        echo 'Creating new build'
-        echo ${{ secrets.PASS_USER }} | sudo -S mkdir -p /eos/project-q/quasar/www
-
         echo 'Copying new build to EOS
+        echo ${{ secrets.PASS_USER }} | sudo -S mkdir -p /eos/project-q/quasar/www
         cp -a . /eos/project-q/quasar/www
