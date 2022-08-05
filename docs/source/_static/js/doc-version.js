@@ -15,7 +15,10 @@ function getGhPagesCurrentFolder() {
 
 function getCurrentUrl() {
   var idx_path = window.location.href.includes('version') ? 5 : 3;
-  var current_url = window.location.href.split('/').slice(0, idx_path).join('/');
+  var current_url = window.location.href
+    .split('/')
+    .slice(0, idx_path)
+    .join('/');
   return current_url;
 }
 
@@ -29,7 +32,8 @@ function _addVersionsMenu(version_data) {
   var folders = version_data['versions'];
   var current_url = getCurrentUrl();
   var current_folder = getGhPagesCurrentFolder();
-  var current_version = version_data['labels'][current_folder] || current_folder;
+  var current_version =
+    version_data['labels'][current_folder] || current_folder;
   var menu = document.createElement('div');
   menu.setAttribute('class', 'rst-versions');
   menu.setAttribute('data-toggle', 'rst-versions');
@@ -78,6 +82,11 @@ function _addVersionsMenu(version_data) {
         '</a></dd>';
     }
   }
+
+  var urlPDF = current_url + '/quasar.pdf';
+  var urlEPUB = current_url + '/Quasar.epub';
+  var inner_html = inner_html + "<dd><a href='" + urlPDF + "'>PDF</a></dd>";
+  var inner_html = inner_html + "<dd><a href='" + urlEPUB + "'>ePUB</a></dd>";
 
   var github_project_url = getGithubProjectUrl();
   if (github_project_url !== null && github_project_url.length > 0) {

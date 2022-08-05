@@ -40,10 +40,18 @@ jobs:
         echo "Creating new folder ${{ env.VERSION_NAME }}"
         mkdir -p /home/fmagalla/quasar/${{ env.VERSION_NAME }}
 
-    - name: Build documentation
+    - name: Build documentation HTML
       run: |
         cd "${GITHUB_WORKSPACE}/docs"
         sphinx-build -b html ./source ./_build/${{ env.VERSION_NAME }}
+    
+    - name: Build documentation PDF as ePUB
+        cd "${GITHUB_WORKSPACE}/docs"
+        make latexpdf
+        cp ./build/latex/quasar/pdf ./_build/${{ env.VERSION_NAME }}
+
+        make epub
+        cp ./build/epub/Quasar.epub ./_build/${{ env.VERSION_NAME }}
 
     - name: Update server
       run: |
