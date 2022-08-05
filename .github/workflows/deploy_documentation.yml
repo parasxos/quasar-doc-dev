@@ -48,8 +48,6 @@ jobs:
     - name: Build documentation PDF as ePUB
       run: |
         cd "${GITHUB_WORKSPACE}/docs"
-        make latexpdf
-        cp ./build/latex/quasar/pdf ./_build/${{ env.VERSION_NAME }}
 
         make epub
         cp ./build/epub/Quasar.epub ./_build/${{ env.VERSION_NAME }}
