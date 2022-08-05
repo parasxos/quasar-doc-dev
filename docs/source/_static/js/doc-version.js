@@ -83,11 +83,11 @@ function _addVersionsMenu(version_data) {
     }
   }
 
-  var inner_html = inner_html + "<dt>Downloads</dt>";
+  //var inner_html = inner_html + "<dt>Downloads</dt>";
   //var urlPDF = current_url + '/quasar.pdf';
-  var urlEPUB = current_url + '/Quasar.epub';
+  //var urlEPUB = current_url + '/Quasar.epub';
   //var inner_html = inner_html + "<dd><a href='" + urlPDF + "'>PDF</a></dd>";
-  var inner_html = inner_html + "<dd><a href='" + urlEPUB + "'>ePUB</a></dd>";
+  //var inner_html = inner_html + "<dd><a href='" + urlEPUB + "'>ePUB</a></dd>";
 
   var github_project_url = getGithubProjectUrl();
   if (github_project_url !== null && github_project_url.length > 0) {
