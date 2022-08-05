@@ -108,7 +108,6 @@ jobs:
         echo ${{ secrets.PASS_USER }} | sudo -S nginx -s reload
 
     - name: Update EOS page
-      if: ${{ env.VERSION_NAME == 'latest' && env.DEPLOYMENT == 'true' }}
       run: |
         cd "${GITHUB_WORKSPACE}/docs/_build/${{ env.VERSION_NAME }}"
   
