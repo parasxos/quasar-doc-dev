@@ -52,3 +52,4 @@ When a new release is created, a GitHub Action workflow is executed, this action
   "latest": "latest"
 }
 ```
+
