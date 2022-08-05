@@ -78,3 +78,17 @@ jobs:
 
         echo 'Reloading nginx'
         echo ${{ secrets.PASS_USER }} | sudo -S nginx -s reload
+
+    - name: Update EOS page
+      if: ${{ env.VERSION_NAME  == 'latest' }}
+      run: |
+        cd "${GITHUB_WORKSPACE}/docs/_build/${{ env.VERSION_NAME }}"
+        
+        echo 'Removing old build'
+        echo ${{ secrets.PASS_USER }} | sudo -S rm -rf /eos/project-q/quasar/www
+
+        echo 'Creating new build'
+        echo ${{ secrets.PASS_USER }} | sudo -S mkdir -p /eos/project-q/quasar/www
+
+        echo 'Copying new build to EOS
+        cp -a . /eos/project-q/quasar/www
