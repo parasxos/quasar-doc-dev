@@ -46,6 +46,7 @@ jobs:
         sphinx-build -b html ./source ./_build/${{ env.VERSION_NAME }}
     
     - name: Build documentation PDF as ePUB
+      run: |
         cd "${GITHUB_WORKSPACE}/docs"
         make latexpdf
         cp ./build/latex/quasar/pdf ./_build/${{ env.VERSION_NAME }}
