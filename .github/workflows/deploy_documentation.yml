@@ -26,6 +26,7 @@ jobs:
     
     - name: Check if deployment is needed
       run: |
+        echo ${{ steps.changed-files-for-docs.outputs.any_changed }}
         if [ ${{ steps.changed-files-for-docs.outputs.any_changed == 'true' }} = true ]; then
           echo "Deployment is needed"
           echo "DEPLOYMENT=true" >> "$GITHUB_ENV"
