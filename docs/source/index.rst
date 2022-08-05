@@ -13,7 +13,7 @@ Quasar
 
 
 .. toctree::
-   :caption: HTML documentation
+   :caption: Documentation
 
 
 		Alternative backends <./converted/AlternativeBackends>
