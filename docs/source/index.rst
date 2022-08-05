@@ -17,6 +17,7 @@ Quasar
 
 
 		Alternative backends <./converted/AlternativeBackends>
+		Calculated variables <./converted/CalculatedVariables>
 		ChangeLog <./converted/ChangeLog>
 		Design manual <./converted/DesignManual>
 		For quasar developers <./converted/forQuasarDevelopers>

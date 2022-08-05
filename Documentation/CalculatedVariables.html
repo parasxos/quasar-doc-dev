@@ -1,0 +1,1059 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>CalculatedVariables</title>
+    <style>
+
+body
+{
+counter-reset: h1counter;
+}
+
+h1:before {
+content: counter(h1counter) ". " ;
+counter-increment: h1counter;
+}
+
+h1 {
+counter-reset: h2counter;
+
+}
+
+h2:before {
+content: counter(h1counter) "." counter(h2counter) ". " ;
+counter-increment: h2counter;
+}
+
+h2 {
+  counter-reset: h3counter;
+}
+
+h3:before {
+content: counter(h1counter) "." counter(h2counter) "." counter(h3counter) ". " ;
+counter-increment: h3counter;
+}
+
+
+
+
+    table {
+        border-width: 10px;
+        border-collapse: collapse;
+    }
+
+    td, th {
+        border: 1px solid black;
+        padding: 4px;
+    }
+
+    th
+    {
+        background-color: #4CAF50;
+        color: white;
+        text-align: left;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .mycode {
+      font-family: monospace;
+      border-style: dotted;
+      border-width: 1px;
+      background-color:
+        #eeeeff;
+      padding: .5em;
+      margin: 1em;
+      display: inline-block;
+
+    }
+
+
+</style>
+  </head>
+  <body>
+    <h1 size="+3">Calculated Variables</h1><br>
+    <br>
+    by: Piotr Nikiel, Oct-Nov 2018<br>
+    Updated August 2021<br>
+    <br>
+    <h2>Overview and end-user documentation<br>
+    </h2>
+    <h2>Preface</h2>
+    A lot of concepts and work done in the context of quasar's
+    CalculatedVariables module has been inspired by V.Filimonov's
+    "CalculatedItems" concept in the CANopen OPC-UA server.<br>
+    I'd like to acknowledge his contribution as my inspiration (even
+    though the CalculatedVariables module is designed entirely from
+    scratch and using original architecture as well as different
+    concepts and technologies).<br>
+    <br>
+    <h2>Rationale</h2>
+    <p>A quasar-based OPC-UA server is based on a model of a system it
+      is made for. This model is called a design. The model explains (in
+      terms of quasar classes, variables etc.) what sources and sinks of
+      information the system can publish or digest.<br>
+    </p>
+    <p>Often it is practical to add supplementary sources of information
+      - like Calculated Variables - on top of what the model already
+      provides. The reasons for doing this are often the following:<br>
+    </p>
+    <ul>
+      <li>the system already provides information which is expressed in
+        quantities different than requested by users.<br>
+        Example: an OPC-UA server is built for a device which measures
+        period of a repetitive process, but the users prefer frequency
+        instead.<br>
+        Solution: a Calculated Variable might be added to the server
+        with a simple reciprocal (y=1/x) formula to compute frequency in
+        terms of period.</li>
+      <li>the system already provides information but in another unit. <br>
+      </li>
+      <li>the system provides raw (e.g. uncalibrated) information.<br>
+        Example: an OPC-UA server publishes data from Analog to Digital
+        Converter. This is raw information though.<br>
+        Solution: a Calculated Variable might be added to provide for
+        gain and offset calibration.</li>
+      <li>similarly to the example above, the ADC might have the value
+        from a conversion of e.g. a temperature sensor. A Calculated
+        Variable might be attached with a formula that recomputes the
+        ADC value (in volts) into temperature.</li>
+    </ul>
+    <h2>Design-based variables vs CalculatedVariables<br>
+    </h2>
+    <table>
+      <thead> <tr>
+          <th>Aspect</th>
+          <th>Design-based variable (cache-variable or source-variable)</th>
+          <th>Calculated Variable</th>
+        </tr>
+      </thead> <tbody>
+        <tr>
+          <td valign="top">Instantiation<br>
+          </td>
+          <td valign="top">The variable always belongs to an object of a
+            quasar class which is defined by the model (Design).<br>
+            Therefore it's the design which determines its type,
+            behaviour, limitations etc.<br>
+          </td>
+          <td valign="top">The variable is defined in the configuration
+            file which is loaded at runtime.<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">Source of information<br>
+          </td>
+          <td valign="top">Comes from inside of the server, typically
+            from user supplied Device logic. Any method available by C++
+            programming can be used.<br>
+          </td>
+          <td valign="top">Is a result of an analytical expression
+            evaluation. The inputs to the expression can be:<br>
+            <ul>
+              <li>literal constants (e.g. 1000.0 or _pi)</li>
+              <li>scalar cache variables which output numbers (i.e. are
+                of any numeric quasar data type)</li>
+              <li>other calculated variables</li>
+              <li>free variables</li>
+              <li>config entries of numeric data-type</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">Output type<br>
+          </td>
+          <td valign="top">Any supported by quasar, including arrays.<br>
+          </td>
+          <td valign="top">Double or boolean scalar.<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">Adding new variable per quasar class requires
+            recompilation?<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+          <td valign="top">No<br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <h2>Feature list</h2>
+    <table>
+      <tbody>
+        <tr>
+          <td valign="top"><b>Feature</b><br>
+          </td>
+          <td valign="top"><b>State</b><br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">Supports all quasar numerical types<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">Formulas with N inputs<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">Good/Bad/WaitingForInitialData support<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">Separate formula for status evaluation<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">Support for delegated cache-variables<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">Tracing in separate LogIt component<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">open62541 compatibility<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">Initial value support<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">Evaluation as boolean<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">Atomic passing of value and status, thread
+            safety<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">Optimizing out variables not used in any
+            expression<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">Formula templates<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p><br>
+    </p>
+    <h2>Operators and built-in functions</h2>
+    <p>A summary of functions, operators and constants which mu::Parser
+      supports is pasted here for reference.<br>
+    </p>
+    <p>Built-in functions<br>
+    </p>
+    <table>
+      <tbody>
+        <tr>
+          <td><b>Name</b></td>
+          <td><b>Argc.</b></td>
+          <td><b>Explanation</b></td>
+        </tr>
+        <tr>
+          <td><code>sin</code></td>
+          <td class="centered">1</td>
+          <td>sine function</td>
+        </tr>
+        <tr>
+          <td><code>cos</code></td>
+          <td class="centered">1</td>
+          <td>cosine function</td>
+        </tr>
+        <tr>
+          <td><code>tan</code></td>
+          <td class="centered">1</td>
+          <td>tangens function</td>
+        </tr>
+        <tr>
+          <td><code>asin</code></td>
+          <td class="centered">1</td>
+          <td>arcus sine function</td>
+        </tr>
+        <tr>
+          <td><code>acos</code></td>
+          <td class="centered">1</td>
+          <td>arcus cosine function</td>
+        </tr>
+        <tr>
+          <td><code>atan</code></td>
+          <td class="centered">1</td>
+          <td>arcus tangens function</td>
+        </tr>
+        <tr>
+          <td><code>sinh</code></td>
+          <td class="centered">1</td>
+          <td>hyperbolic sine function</td>
+        </tr>
+        <tr>
+          <td><code>cosh</code></td>
+          <td class="centered">1</td>
+          <td>hyperbolic cosine</td>
+        </tr>
+        <tr>
+          <td><code>tanh</code></td>
+          <td class="centered">1</td>
+          <td>hyperbolic tangens function</td>
+        </tr>
+        <tr>
+          <td><code>asinh</code></td>
+          <td class="centered">1</td>
+          <td>hyperbolic arcus sine function</td>
+        </tr>
+        <tr>
+          <td><code>acosh</code></td>
+          <td class="centered">1</td>
+          <td>hyperbolic arcus tangens function</td>
+        </tr>
+        <tr>
+          <td><code>atanh</code></td>
+          <td class="centered">1</td>
+          <td>hyperbolic arcur tangens function</td>
+        </tr>
+        <tr>
+          <td><code>log2</code></td>
+          <td class="centered">1</td>
+          <td>logarithm to the base 2</td>
+        </tr>
+        <tr>
+          <td><code>log10</code></td>
+          <td class="centered">1</td>
+          <td>logarithm to the base 10</td>
+        </tr>
+        <tr>
+          <td><code>log</code></td>
+          <td class="centered">1</td>
+          <td>logarithm to base e (2.71828...)</td>
+        </tr>
+        <tr>
+          <td><code>ln</code></td>
+          <td class="centered">1</td>
+          <td>logarithm to base e (2.71828...)</td>
+        </tr>
+        <tr>
+          <td><code>exp</code></td>
+          <td class="centered">1</td>
+          <td>e raised to the power of x</td>
+        </tr>
+        <tr>
+          <td><code>sqrt</code></td>
+          <td class="centered">1</td>
+          <td>square root of a value</td>
+        </tr>
+        <tr>
+          <td><code>sign</code></td>
+          <td class="centered">1</td>
+          <td>sign function -1 if x&lt;0; 1 if x&gt;0</td>
+        </tr>
+        <tr>
+          <td><code>rint</code></td>
+          <td class="centered">1</td>
+          <td>round to nearest integer</td>
+        </tr>
+        <tr>
+          <td><code>abs</code></td>
+          <td class="centered">1</td>
+          <td>absolute value</td>
+        </tr>
+        <tr>
+          <td><code>min</code></td>
+          <td class="centered">var.</td>
+          <td>min of all arguments</td>
+        </tr>
+        <tr>
+          <td><code>max</code></td>
+          <td class="centered">var.</td>
+          <td>max of all arguments</td>
+        </tr>
+        <tr>
+          <td><code>sum</code></td>
+          <td class="centered">var.</td>
+          <td>sum of all arguments</td>
+        </tr>
+        <tr>
+          <td><code>avg</code></td>
+          <td class="centered">var.</td>
+          <td>mean value of all arguments<br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p> </p>
+    <br>
+    Built-in operators<br>
+    <br>
+    <br>
+    <table>
+      <thead><tr>
+          <td><b>Operator</b></td>
+          <td><b>Description</b></td>
+          <td><b>Priority</b></td>
+        </tr>
+      </thead> <tbody>
+        <tr>
+          <td><code>=</code></td>
+          <td>assignement</td>
+          <td>-1</td>
+        </tr>
+        <tr>
+          <td><code>&amp;&amp;</code></td>
+          <td>logical and</td>
+          <td> 1</td>
+        </tr>
+        <tr>
+          <td><code>||</code></td>
+          <td>logical or</td>
+          <td> 2</td>
+        </tr>
+        <tr>
+          <td><code>&lt;=</code></td>
+          <td>less or equal</td>
+          <td> 4</td>
+        </tr>
+        <tr>
+          <td><code>&gt;=</code></td>
+          <td>greater or equal</td>
+          <td> 4</td>
+        </tr>
+        <tr>
+          <td><code>!=</code></td>
+          <td>not equal</td>
+          <td> 4</td>
+        </tr>
+        <tr>
+          <td><code>==</code></td>
+          <td>equal</td>
+          <td> 4</td>
+        </tr>
+        <tr>
+          <td><code>&gt;</code></td>
+          <td>greater than</td>
+          <td> 4</td>
+        </tr>
+        <tr>
+          <td><code>&lt;</code></td>
+          <td>less than</td>
+          <td> 4</td>
+        </tr>
+        <tr>
+          <td><code>+</code></td>
+          <td>addition</td>
+          <td> 5</td>
+        </tr>
+        <tr>
+          <td><code>-</code></td>
+          <td>subtraction</td>
+          <td> 5</td>
+        </tr>
+        <tr>
+          <td><code>*</code></td>
+          <td>multiplication</td>
+          <td> 6</td>
+        </tr>
+        <tr>
+          <td><code>/</code></td>
+          <td>division</td>
+          <td> 6</td>
+        </tr>
+        <tr>
+          <td><code>^</code></td>
+          <td>raise x to the power of y</td>
+          <td> 7<br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p><br>
+      Common mathematical constants<br>
+      _pi, _e <br>
+    </p>
+    <h2>Configuration file schema regarding Calculated Variables<br>
+    </h2>
+    <p>The XML element type is called CalculatedVariable and it has the
+      following attributes:<br>
+    </p>
+    <table>
+      <thead> <tr>
+          <th valign="top"><b>Name</b><b><br>
+            </b></th>
+          <th valign="top"><b>Obligatory?</b><b><br>
+            </b></th>
+          <th valign="top"><b>XSD Type</b><br>
+          </th>
+          <th valign="top"><b>Meaning</b><b><br>
+            </b></th>
+        </tr>
+      </thead><tbody>
+        <tr>
+          <td valign="top">name<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+          <td valign="top">xs:string<br>
+          </td>
+          <td valign="top">Name of this calculated variable. Note that
+            the full address that this variable obtains will be the name
+            prefixed by the address of position in the Address Space
+            where the variable gets instantiated. <br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">value<br>
+          </td>
+          <td valign="top">Yes<br>
+          </td>
+          <td valign="top">xs:string<br>
+          </td>
+          <td valign="top">Value formula, that is: an analytical
+            expression used to evaluate value of this variable. Some
+            examples will be given below.<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">initialValue<br>
+          </td>
+          <td valign="top">No<br>
+          </td>
+          <td valign="top">xs:double<br>
+          </td>
+          <td valign="top">Initial value, i.e. the value that this
+            variable will hold BEFORE first evaluation happens (which
+            normally is when all formula ingredients receive the initial
+            update). If initialValue is not given then the variable will
+            hold NULL along BadWaitingForInitialData status.<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">isBoolean<br>
+          </td>
+          <td valign="top">No<br>
+          </td>
+          <td valign="top">xs:boolean<br>
+          </td>
+          <td valign="top">Evaluate and present as boolean. The final
+            result will be OpcUa_True if the calculation result is
+            non-zero.<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">status<br>
+          </td>
+          <td valign="top">No<br>
+          </td>
+          <td valign="top">xs:string<br>
+          </td>
+          <td valign="top">Status formula, that is: an analytical
+            expression used to evaluate OPC-UA status-code of this
+            variable. The status-code will be OpcUa_Good if the formula
+            evaluates to non-zero otherwise OpcUa_Bad. If status formula
+            is not used then by default the variable is OpcUa_Good when
+            all input arguments are in good status, or OpcUa_Bad
+            otherwise<br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>The XML element CalculatedVariable can be attached under any
+      quasar object declaration as well as on global scope.<br>
+    </p>
+    <h2>Meta-functions and meta-operators (dollar signs in the formulas)</h2>
+    <p>It is often practical to perform some sort of elaboration of
+      configured formulas before they are given to be compiled by the
+      formula parser. Such elaboration steps are achieved by placing
+      dollar-sign operators and functions in the formulas. For all
+      examples below, the following quasar design diagram is used:<br>
+    </p>
+    <img moz-do-not-send="true" src="sample_design.png" alt=""
+      width="10%"><br>
+    <h3> $thisObjectAddress</h3>
+    $thisObjectAddress evaluates to the string address of the object
+    under which the calculated variable was instantiated. It finds a
+    very practical application to build generalized formulas, which can
+    be applied "under" multiple places in the address-space, so
+    $thisObjectAddress serves as the relative pointer to the object
+    address.<br>
+    Using the design as above, the following config file shows a sample
+    application:<br>
+    <br>
+    <pre class="mycode">	&lt;TestClass name="tc"&gt;<br>		&lt;CalculatedVariable name="test_var_multiplied" value="$thisObjectAddress.testVariable * 1000" /&gt;<br>	&lt;/TestClass&gt;<br></pre>
+    <h3> $parentObjectAddress(numLevelsUp=N)</h3>
+    $parentObjectAddress is a generalization of $thisObjectAddress. For
+    N=0 it evaluates to $thisObjectAddress, for N=1 to its parent object
+    and so on.<br>
+    Using the design as above, the following config file shows a sample
+    application:<br>
+    <br>
+    <pre class="mycode">	&lt;TestClass name="tc"&gt;<br>		&lt;TestSubClass name="tsc"&gt;<br>			&lt;CalculatedVariable name="test_var_multiplied" value="$parentObjectAddress(numLevelsUp=1).testVariable * 1000" /&gt;<br>		&lt;/TestSubClass&gt;<br>	&lt;/TestClass&gt;<br><br></pre>
+    <h3>$applyGenericFormula(formula)</h3>
+    <p>$applyGenericFormula is used in the context of generalized
+      function templates and <a moz-do-not-send="true"
+        href="#Generalized_formula_templates">documented there</a>.<br>
+    </p>
+    <ul>
+    </ul>
+    <h2><a name="Generalized_formula_templates"></a>Generalized formula
+      templates<br>
+    </h2>
+    Multiple sensors of same type are likely to use same formulas (with
+    possibly different calibration constants). Thus it is economical to
+    share formulas between them if configuration file
+    readibility/clarity would profit.<br>
+    <br>
+    The basic application of generalized formula templates is composed
+    of the following steps:<br>
+    <ul>
+      <li>defining the generalized formula at the top of the
+        configuration file using the CalculatedVariableGenericFormula
+        XML element</li>
+      <li>applying the formula at the point of use using
+        $applyGenericFormula meta-function.</li>
+    </ul>
+    <p>Technically, the job done by quasar for applying the formula at
+      the point of use boils down to pasting the formula in place of the
+      meta-function. In the future, extending this operation by optional
+      arguments, might be considered.<br>
+    </p>
+    <p>An example of the generalized formula template from a real system
+      (CERN - ATLAS DCS - New Small Wheel project, courtesy of P.
+      Tzanis) is given. The generalized formula is put at the top of the
+      configuration file:<br>
+    </p>
+    <pre class="mycode"><meta http-equiv="content-type" content="text/html; charset=UTF-8"><pre class="code-java">&lt;CalculatedVariableGenericFormula name=<span class="code-quote">"thermistorTemperature"</span>
+      formula=<span class="code-quote">"1/( 3.3540154*10^(-3)+(2.5627725*10^(-4)*log(1000*$thisObjectAddress.value/500))+(2.0829210*10^(-6)*(log(1000*$thisObjectAddress.value/500))^2)+(7.3003206*10^(-8)*(log(1000*$thisObjectAddress.value/500))^3)) -273.15"</span>/&gt;</pre></pre>
+    <br>
+    As can be seen, the formula profits from $thisObjectAddress
+    meta-function which enables its reuse at any place of the
+    configuration (so, consequently, the address-space) which has a
+    sibling variable called "value" (which, in the case of the
+    particular application, is the converted voltage expressed in
+    volts).<br>
+    <br>
+    Then, the application of the formula is done in the following way:<br>
+    <br>
+    <pre class="mycode"><meta http-equiv="content-type" content="text/html; charset=UTF-8"><pre class="code-java">&lt;AnalogInput id=<span class="code-quote">"0"</span> name=<span class="code-quote">"GBTX1_TEMP"</span> enableCurrentSource=<span class="code-quote">"<span class="code-keyword">true</span>"</span> &gt; &lt;CalculatedVariable name=<span class="code-quote">"temperature"</span> value=<span class="code-quote">"$applyGenericFormula(thermistorTemperature)"</span> /&gt; &lt;/AnalogInput&gt; <br>&lt;AnalogInput id=<span class="code-quote">"1"</span> name=<span class="code-quote">"GBTX2_TEMP"</span> enableCurrentSource=<span class="code-quote">"<span class="code-keyword">true</span>"</span> &gt; &lt;CalculatedVariable name=<span class="code-quote">"temperature"</span> value=<span class="code-quote">"$applyGenericFormula(thermistorTemperature)"</span> /&gt; &lt;/AnalogInput&gt;</pre></pre>
+    <h2>CalculatedVariables logging and tracing</h2>
+    CalculatedVariables module has its own LogIt component called
+    "CalcVars".<br>
+    <br>
+    As it's the case with any LogIt logging component, its log levels
+    can be configured via the address-space as well as in the
+    configuration file. The latter is often needed because most of
+    potential issues (formula errors) would happen at the server
+    initialization, i.e. before it is possible and practical to raise
+    verbosity using the address-space. <br>
+    <br>
+    Thus, in case of issues with formulas, it is advised to put the
+    CalcVars log level to TRC, for instance by means of the XML
+    configuration:<br>
+    <br>
+    <pre class="mycode">        &lt;StandardMetaData&gt;<br>                &lt;Log&gt;<br>                        &lt;ComponentLogLevels&gt;<br>                                &lt;ComponentLogLevel componentName="CalcVars" logLevel="TRC" /&gt;<br>                        &lt;/ComponentLogLevels&gt;<br>                 &lt;/Log&gt;<br>        &lt;/StandardMetaData&gt;<br><br></pre>
+    <h2>Escaping variable names containing dashes ("-") and slashes
+      ("/")</h2>
+    <p>Users of quasar-based servers sometimes choose to name their
+      quasar objects (i.e. the <i>name</i> attribute of XML elements in
+      the configuration files) with names containing dashes or slashes.<br>
+      This is legit in the quasar world. However, it poses some problems
+      if CalculatedVariables inputs connect to such named objects (i.e.
+      its variables).<br>
+    </p>
+    <p>Imagine the following config file:<br>
+    </p>
+    <pre class="mycode">&lt;MyDevice name="Bus1/Device2-A"&gt;<br>  &lt;CalculatedVariable name="calibrationConstant" value="2.35"/&gt;<br>&lt;/MyDevice&gt;<br><br></pre>
+    <br>
+    Such a config file is fine; among different address-space entities
+    instantiated it'd have the CalculatedVariable under address
+    "Bus1/Device2-A.calibrationConstant".<br>
+    However, now imagine that somewhere "later" in the config file,
+    another CalculatedVariable would be introduced and it would refer to
+    the calibrationConstant:<br>
+    <br>
+    <pre class="mycode">&lt;CalculatedVariable name="voltage" value="X -&nbsp; Bus1/Device2-A.calibrationConstant"/&gt;</pre>
+    <br>
+    A problem is clearly seen: in the formula, it is impossible to
+    distinguish if the dashes "-" and slashes "/" refer to input
+    variable names or the subtraction and/or division operators (in
+    simpler cases like in this example one could "guess" the meaning but
+    in general quasar architecture prefers to be more explicit rather
+    than to guess). Note that due to the grammar imposed by the parser
+    engine, the precedence of dashes and slashes will always be given to
+    operators rather than operands.<br>
+    <br>
+    Therefore one needs to escape the dash and slash signs in case these
+    are to refer to variable names. Thus, the aforementioned example
+    would be fixed this way:<br>
+    <br>
+    <pre class="mycode">&nbsp;&lt;CalculatedVariable name="voltage" value="X -&nbsp; Bus1\/Device2\-A.calibrationConstant"/&gt;</pre>
+    <br>
+    <b>Note</b> that those using $thisObjectAddress and/or
+    $parentObjectAddress to derive the input variable address do not
+    have to do anything because both of the meta-functions will escape
+    dashes and slashes behind the scenes.<br>
+    <h2>Examples<br>
+    </h2>
+    <h3>NTC sensors: converting resistance into temperature in Celsius
+      and Fahrenheit degrees<br>
+    </h3>
+    <p>Imagine that a device can measure resistance of a connected
+      resistor. If the resistor happens to be a NTC temperature probe,
+      then one can find the temperature in function of resistance:<br>
+    </p>
+    <p>T = T0 * B / (T0 * ln(R/R0) + B)<br>
+    </p>
+    <p>where T0 is typically 298.15K (that is, +25 deg C in Kelvin
+      degrees), B is the so called B constant of a NTC probe (often
+      3977K) and R0 is the resistance at T0.<br>
+      The variable in the example is R, and that is the cache-variable
+      that gets updated by your OPC-UA server device logic.<br>
+      Let's assume that the OPC-UA address of the variable is
+      NTC1.resistance <br>
+    </p>
+    <p>Therefore, anywhere below NTC1 declaration in your config file,
+      you can instantiate a CalculatedVariable that will recompute the
+      measured resistance into temperature expressed in Kelvin degrees.
+      In the example below we also add some CalculatedVariables to hold
+      B, T0 and R0 constants.<br>
+    </p>
+    <pre class="mycode">&lt;CalculatedVariable name="T0" value="298.15"/&gt;<br>&lt;CalculatedVariable name="B" value="3977"/&gt;<br>&lt;CalculatedVariable name="R0" value="10E3"/&gt;<br>&lt;CalculatedVariable name="temperatureK" value="T0*B/(T0*ln(NTC1.resistance/R0)+B)" /&gt;</pre>
+    <p>We also add two Calculated Variables that will recomputer Kelvins
+      into Celsius degrees and Fahrenheit degrees:<br>
+    </p>
+    <pre class="mycode">&lt;CalculatedVariable name="temperatureC" value="temperatureK-273.15"/&gt;<br>&lt;CalculatedVariable name="temperatureF" value="temperatureC*1.8+32"/&gt;
+</pre>
+    <p>In addition, we can add a boolean variable which subjectively
+      indicates whether it's warm enough. It's an example of usage of
+      logical operators as well as isBoolean attribute:<br>
+    </p>
+    <pre class="mycode">&lt;CalculatedVariable name="isWarmEnough" value="temperatureC &gt; 20" isBoolean="true" /&gt;<br></pre>
+    <h3>CalculatedVariable attached to multiple different quasar
+      entities</h3>
+    <p>This example shall illustrate that a CalculatedVariable can be
+      attached (i.e. its inputs might be) different quasar entities such
+      as: cache-variables, free-variables, other calculated-variables
+      and even config-entries (if they are of some numeric data-type).<br>
+    </p>
+    <pre class="mycode">	&lt;TestClass name="tc" configentry="125"/&gt;<br>	&lt;FreeVariable name="free_variable" type="Double"/&gt;<br>	&lt;CalculatedVariable name="a_calc_var" value="500" /&gt;<br>	&lt;CalculatedVariable<br>		name="sum_of_free_cache_variables_and_configentry" <br>		value="free_variable + tc.testVariable + tc.configentry - a_calc_var" /&gt;<br></pre>
+    <p>As can be seen, the last calculated variable is a function
+      computed of values of many different quasar entities which all
+      corresponds to address-space variables.<br>
+    </p>
+    <h2>Counter-examples</h2>
+    <h3>Place no white-space between unary operation (e.g. a function)
+      and the parenthesis around its operand</h3>
+    <p>Note that it is illegal (i.e. will be refused at configuration
+      loading) to put any whitespace between unary operation (function?)
+      and the operands, e.g. this is legal:<br>
+    </p>
+    <pre class="mycode">&lt;CalculatedVariable name="V300" value="cos(x + 1.4)"/&gt;</pre>
+    <br>
+    and this is illegal:<br>
+    <pre class="mycode">&lt;CalculatedVariable name="V300" value="cos (x + 1.4)"/&gt;</pre>
+    <br>
+    <h2>Advanced documentation for quasar developers</h2>
+    <h2>Selection of expression parser</h2>
+    <p>There exist many open-source parsers potentially suitable for the
+      feature. At the time of writing, a good overview was present at <a
+href="https://github.com/ArashPartow/math-parser-benchmark-project">https://github.com/ArashPartow/math-parser-benchmark-project</a>
+      .<br>
+    </p>
+    <p>The author has evaluated three parsers from the list:<br>
+      <br>
+    </p>
+    <ul>
+      <li><a href="http://www.partow.net/programming/exprtk/">ExprTk</a><br>
+        It made an excellent overall impression. However, due to very
+        intensive use of templates, the compilation time has been
+        significant (i.e. its inclusion would triple(!!) the whole
+        compilation time of a simple quasar server). That unfavourable
+        property has made the quasar team to look for another solution.</li>
+      <li><a href="https://sourceforge.net/projects/atmsp/">ATMSP</a><br>
+        The initial code review has shown that the parser uses
+        setjmp()/longjmp() which has been considered unfavourable for
+        quasar servers.</li>
+      <li><a href="http://beltoforion.de/article.php?a=muparser">muParser</a><br>
+        muParser demonstrated decent performance while it has all the
+        features required by the Calculated Variables feature.<br>
+      </li>
+    </ul>
+    <h2>Overview of feature implementation</h2>
+    <p>An UML class diagram is presented below.<br>
+    </p>
+    <img src="CalculatedVariablesClassDiagram.png" alt="UML"
+      height="765" width="1098"><br>
+    <h2>Classes rationale</h2>
+    <ul>
+      <li>ChangeNotifyingVariable - can emit notifications whenever the
+        variable changed value. Applicable to any data type. Can be used
+        with multiple notification receivers. Can be used for
+        applications different than CalculatedVariables.</li>
+      <li>ParserVariable - stores current numeric variable value as a
+        plain double type, and therefore can be coupled as a mu::Parser
+        variable. (Sidenote: mu::Parser doesn't know anything about
+        OPC-UA and without such arrangement it wouldn't know how to
+        access a double from UaVariant, neither to know whether the
+        value is correct, etc.).</li>
+      <ul>
+        <li>notifyingVariable - is the pointer to a
+          ChangeNotifyingVariable which notifies this particular
+          ParserVariable on change,</li>
+        <li>notifiedVariables - the list of all CalculatedVariables that
+          use this particular ParserVariable in formulas.</li>
+      </ul>
+      <li>CalculatedVariable - it's the OPC-UA variable defined by a
+        formula. It's a subclass of ChangeNotifyingVariable because its
+        output can in turn be used as an input to another Calculated
+        Variable (so it must be able to emit notifications on change).</li>
+      <li>Engine - puts all things together. It supplies methods for
+        usage in Configuration module:</li>
+      <ul>
+        <li>instantiateCalculatedVariable - called whenerver
+          CalculatedVariable() entry is found in the config file,</li>
+        <li>registerVariableForCalculatedVariables - called whenever any
+          cache-variable of suitable design properties (numeric and
+          scalar) is inserted into the OPC-UA address-space<br>
+        </li>
+      </ul>
+    </ul>
+    <h2>Overview of information flow</h2>
+    <ol>
+      <li>All cache-variables instantiated by quasar Configuration
+        module are of ChangeNotifyingVariable type or its subclasses.<br>
+      </li>
+      <li>When quasar Configuration determines that given cache-variable
+        variable looks suitable to be used as a formula input (i.e. is
+        numeric and it's scalar), it would add a ChangeListener and a
+        corresponding ParserVariable. The ChangeListener will (once
+        potentially invoked in future) call setValue() on given
+        ParserVariable. <br>
+      </li>
+      <li>When device logic or an OPC-UA client writes to a suitable
+        cache-variable, the setValue() of ParserVariable bound to the
+        cache-variable will be called. It will store the new value and
+        status in corresponding fields and then call update() on
+        relevant (i.e. those which use given parser variable as an
+        input) CalculatedVariable variables. <br>
+      </li>
+    </ol>
+    <h2>Synchronization, re-entrance, multi-threading<br>
+    </h2>
+    <p>The CalculatedVariables module is closely tied to the
+      AddressSpace of a quasar-based server. <br>
+      For instance, the recalculation of an associated calculated
+      variable is done within the call to a setter of a variable that it
+      depends on. <br>
+    </p>
+    <p>It must be emphasized that AddressSpace is brutally
+      multi-threaded. At the same time, the following thread families
+      would be doing work on AddressSpace objects:<br>
+    </p>
+    <ul>
+      <li>sampling threads which sample current values of
+        cache-variables to which any client subscribes. Those threads
+        are run by chosen OPC-UA backend and their number is highly
+        dependent on backend's configuration (i.e. ServerConfig.xml) as
+        well as possibly on number of connected clients and the set of
+        data they subscribe to.</li>
+      <li>server's OPC-UA requests processing threads. Those threads are
+        run by chosen OPC-UA backend and similarly to sampling threads,
+        their number depends on many factors. Those threads process e.g.
+        Write service requests, so that an OPC-UA client can write to
+        given variable.</li>
+      <li>device logic (or other user threads). Those threads are
+        instantiated by server developers and configured by end-users.
+        They typically push data to the address-space.</li>
+    </ul>
+    <br>
+    In the context of Calculated Variables, there are two obvious
+    critical section types:<br>
+    <ul>
+      <li>possible calls to variable setters of the same variable coming
+        from different threads.<br>
+        The worries here are the following:</li>
+      <ul>
+        <li>there might be a clash in storage of value and status, as
+          both of them are necessary to perform the calculation and (to
+          author's knowledge) such an assignment is never atomic by
+          default. So a recalculation might take value stored by one
+          thread and status from another, or on a 32-bit machine (since
+          double is 64-bits) even take partially stored value.</li>
+        <li>it's not entirely clear if calls to mu::Parser::Eval are
+          re-entrant.</li>
+      </ul>
+      <li>possible concurrent calls from different threads to variable
+        setters of different variables which are used in the same
+        formula.<br>
+        The worries here are the following:</li>
+      <ul>
+        <li>the parser might attempt to use the value when it is being
+          assigned to (and that is not atomic)</li>
+        <li>it's not entirely clear if calls to mu::Parser::Eval are
+          re-entrant.</li>
+      </ul>
+    </ul>
+    <p>Having analyzed the problem and trying to propose a guaranteed
+      dead-lock free solution, the author proposes to form disjoint
+      subgraphs of the calculation graph and synchronize per each
+      subgraph.<br>
+    </p>
+    <p>Let's look at an example for which the calculation graph is like
+      in the picture below.<br>
+    </p>
+    <img src="SynchronizationExample.png" alt="Synchronization example"
+      height="364" width="614"><br>
+    PV stands for ParserVariable, those are all variables that can be
+    used as inputs in a CalculatedVariable formula.<br>
+    CV stands for CalculatedVariable. Note that every CV is also a PV
+    because the output of one formula can be used as an input to another
+    formula.<br>
+    <br>
+    <h3>Case 1: ignore CV4 (violet node and arrows)</h3>
+    Case 1 would happen if we defined the following Calculated Variables
+    in the config file (the particular operators - e.g. addition,
+    multiplication - do not matter):<br>
+    <br>
+    CV1 = PV1 + PV2<br>
+    CV2 = CV1*PV3 + PV2<br>
+    CV3 = 3.14 * PV4<br>
+    <br>
+    In this case the implementation will form two domains of mutual
+    exclusion (called synchronizers):<br>
+    <ul>
+      <li>1st one, which will provide exclusive access to setters of
+        PV1, PV2 and PV3 (e.g. if any thread would enter setter of any
+        of {PV1, PV2, PV3} all other threads willing to do the same
+        would need to wait)</li>
+      <li>2nd one, which will provide exclusive access to setter of PV4</li>
+    </ul>
+    <p>PV5 would not get a synchronizer because it's output is not used
+      by anything; in fact PV5 would be optimized out after the
+      configuration process is finished.<br>
+    </p>
+    <h3>Case 2: CV4 is added</h3>
+    Now let's add CV4 to the picture.<br>
+    <br>
+    This (apparently) small extension actually does change a lot in the
+    multi-threading schema: now one mutual exclusion domain gets formed
+    which covers all possible setters. <br>
+    Though such a scenario is rather unlikely to be seen, server
+    developers and users should be aware of this relation.<br>
+    <br>
+    <h2>Supplementary notes on certain design decisions</h2>
+    <h3>Why constants from config entries propagate into ParserVariables
+      rather than being declared using muParser::DefineConst?</h3>
+    <p><br>
+    </p>
+    <h2>Benchmarks</h2>
+    <p>Some benchmarks have been performed. The base has been pre-1.3.1
+      release of quasar. The benchmarks have been performed with UA-SDK
+      1.5.5 as the OPC-UA backend.<br>
+    </p>
+    <p>Aspect </p>
+    <table>
+      <tbody>
+        <tr>
+          <th class="confluenceTh"><br>
+          </th>
+          <th class="confluenceTh">quasar w/o Calculated Variables
+            support</th>
+          <th class="confluenceTh">quasar w Calculated Variables support<br>
+            (note: no Calc Vars declared!)</th>
+          <th class="confluenceTh">Diff</th>
+        </tr>
+        <tr>
+          <td class="confluenceTd">Build time of a simple, one-class
+            server</td>
+          <td class="confluenceTd">55s<br>
+            56s<br>
+            54s<br>
+            AVG = 55s</td>
+          <td class="confluenceTd">1m15s<br>
+            1m3s<br>
+            59s<br>
+            AVG = 65s</td>
+          <td class="confluenceTd">18% longer</td>
+        </tr>
+        <tr>
+          <td class="confluenceTd">Build time of a complex server (here:
+            SCA)</td>
+          <td class="confluenceTd">4m15s</td>
+          <td class="confluenceTd">4m25s</td>
+          <td class="confluenceTd">3.9% longer</td>
+        </tr>
+        <tr>
+          <td class="confluenceTd">Time to publish 100M random doubles
+            via a cache-variable</td>
+          <td class="confluenceTd">32793 ms<br>
+            32892 ms<br>
+            32623 ms<br>
+            AVG = 32768 ms</td>
+          <td class="confluenceTd">32917 ms<br>
+            33313 ms<br>
+            33460 ms<br>
+            AVG = 33230 ms</td>
+          <td class="confluenceTd">1.4% more overhead</td>
+        </tr>
+        <tr>
+          <td class="confluenceTd">Valgrind info (publishing 1M random
+            doubles)</td>
+          <td class="confluenceTd">==6591== HEAP SUMMARY:<br>
+            ==6591== in use at exit: 27,753 bytes in 209 blocks<br>
+            ==6591== total heap usage: 1,031,151 allocs, 1,030,942
+            frees, 72,543,037 bytes allocated</td>
+          <td class="confluenceTd">==5861== HEAP SUMMARY:<br>
+            ==5861== in use at exit: 28,458 bytes in 213 blocks<br>
+            ==5861== total heap usage: 1,032,466 allocs, 1,032,253
+            frees, 75,191,342 bytes allocated</td>
+          <td class="confluenceTd">0.1% more allocs<br>
+            &nbsp;<br>
+            note "bytes allocated" has no relation to the actual size of
+            RSS memory of a running process!</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><br>
+    </p>
+    <h2>muParser distribution model</h2>
+    <p>The muParser is distributed along quasar in an amalgamated way.<br>
+    </p>
+    <p>In quasar repo, you can go to:<br>
+      CalculatedVariables/ext_components/<br>
+      where you will find a script "clone_and_amalgamate_muparser.sh"
+      which will perform cloning of muParser and then amalgamation.<br>
+    </p>
+    <p>Note that the particular version of muParser as well as
+      accompanying amalgamation utility is fixed so there is no reason
+      to run the script without changing the version.<br>
+      <br>
+    </p>
+    <p> </p>
+    <ol>
+    </ol>
+  </body>
+</html>
