@@ -37,6 +37,7 @@ When a new release is created, a GitHub Action workflow is executed, this action
   "versions": [ "latest", "1.8.1" ],
   
   // This section contains the labels to rename the versions.
+  // If the version is not in this list, the label will be the same defined on "versions" list below
   "labels": {
     "latest": "Latest"
   },
