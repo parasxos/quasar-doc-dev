@@ -26,7 +26,7 @@ jobs:
     
     - name: Check if deployment is needed
       run: |
-        if [ ${{ steps.changed-files-for-docs.outputs.any_changed == 'true' }} ]; then
+        if [ ${{ steps.changed-files-for-docs.outputs.any_changed == 'true' }} = true ]; then
           echo "Deployment is needed"
         else
           echo "No deployment is needed"
