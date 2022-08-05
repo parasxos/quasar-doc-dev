@@ -59,6 +59,8 @@ html_js_files = [
   'js/doc-version.js',
 ]
 
+html_favicon = '_static/favicon.ico'
+
 locale_dirs = ['../locales']
 
 html_context = {
