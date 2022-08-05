@@ -7,7 +7,7 @@ This file contains the documentation of the deployment process of Quasar Framewo
 The deployment must be performed on a server, which run a GitHub Action workflow. For do that the following dependencies must be installed on the server:
 
 - pip3: `yum install -y python3-pip`
-- Python 3.8 or higher: `yum install -y python3-devel`
+- Python 3.8 or higher: `yum install -y python3`
 - textlive: `yum install texlive-*`
 - Github Action CLI: go to Setting section of your repository, then click on Runners and add the runner, then execute all the command shown on the server.
 
