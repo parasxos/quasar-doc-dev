@@ -172,7 +172,7 @@ def update_index(html_files, external_files, note_files, path_index, exceptions_
     lines = f.readlines()
 
   print(f'\tInserting html files')
-  idx_html = find_line('HTML documentation', gap=3, lines=lines)
+  idx_html = find_line('Documentation', gap=3, lines=lines)
   format_str = '\t\t{clean_name} <./converted/{filename}>\n'
   idx_html, lines = insert_files(idx_html, format_str, html_files, lines, exceptions_clean, is_rst=True)
 

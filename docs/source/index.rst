@@ -13,7 +13,8 @@ Quasar
 
 
 .. toctree::
-   :caption: Documentation
+  :hidden:
+  :caption: Documentation
 
 
 		Alternative backends <./converted/AlternativeBackends>
@@ -33,7 +34,8 @@ Quasar
 		Youtube links <./converted/youtube_links>
 
 .. toctree::
-   :caption: Additional files
+  :hidden:
+  :caption: Additional files
 
 
 	External files <./external_files>
@@ -41,7 +43,8 @@ Quasar
 
 
 .. toctree::
-   :caption: Quasar OpcUa Server
+  :hidden:
+  :caption: Quasar OpcUa Server
 
-   Summary of known quasar-based OPC-UA servers <./converted/quasar_OPC_UA_servers>
+  Summary of known quasar-based OPC-UA servers <./converted/quasar_OPC_UA_servers>
 
