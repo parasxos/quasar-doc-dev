@@ -18,13 +18,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up @changed-files
+    - name: Check if deployment is needed
       id: changed-files-for-docs
       uses: tj-actions/changed-files@v24.1
       with:
-        path: docs
-    
-    - name: Check if deployment is needed
+        path: docs    
       run: |
         if [ ${{ steps.changed-files-for-docs.outputs.any_changed == 'true' }} = true ]; then
           echo "Deployment is needed"
