@@ -19,7 +19,6 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Define version name
-      if: ${{ env.DEPLOYMENT == 'true' }}
       run: |
         if [ ${{ startsWith(github.ref_name, 'dev') }} = true ]; then
           echo "VERSION_NAME=${{ github.ref_name }}" >> "$GITHUB_ENV"
@@ -31,26 +30,22 @@ jobs:
         echo 'Version to build: ${{ env.VERSION_NAME }}'
 
     - name: Install dependencies
-      if: ${{ env.DEPLOYMENT == 'true' }}
       run: |
         echo "${GITHUB_WORKSPACE}/"
         cd "${GITHUB_WORKSPACE}/"
         pip3 install --user -r requirements.txt
 
     - name: Create new folder
-      if: ${{ env.DEPLOYMENT == 'true' }}
       run: |
         echo "Creating new folder ${{ env.VERSION_NAME }}"
         mkdir -p /home/fmagalla/quasar/${{ env.VERSION_NAME }}
 
     - name: Build HTML documentation
-      if: ${{ env.DEPLOYMENT == 'true' }}
       run: |
         cd "${GITHUB_WORKSPACE}/docs"
         sphinx-build -b html ./source ./_build/${{ env.VERSION_NAME }}
     
     - name: Build documentation PDF as ePUB
-      if: ${{ env.DEPLOYMENT == 'true' }}
       run: |
         cd "${GITHUB_WORKSPACE}/docs"
 
@@ -63,7 +58,6 @@ jobs:
         mv ./_build/${{ env.VERSION_NAME }}/quasar.pdf ./_build/${{ env.VERSION_NAME }}/Quasar\ ${{ env.VERSION_NAME }}.pdf
 
     - name: Update server
-      if: ${{ env.DEPLOYMENT == 'true' }}
       run: |
         echo 'Change directory location to build html'
         cd "${GITHUB_WORKSPACE}/docs/_build/${{ env.VERSION_NAME }}"
@@ -84,7 +78,7 @@ jobs:
         echo ${{ secrets.PASS_USER }} | sudo -S nginx -s reload
 
     - name: Update EOS page
-      if: ${{ env.DEPLOYMENT == 'true' }}
+      if: ${{ env.VERSION_NAME == 'latest' }}
       run: |
         cd "${GITHUB_WORKSPACE}/docs/_build/${{ env.VERSION_NAME }}"
   
