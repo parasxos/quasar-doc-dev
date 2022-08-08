@@ -16,11 +16,8 @@ jobs:
 
     steps:
 
-    - name: Checkout docs folder
+    - name: Checkout docs
       uses: actions/checkout@v2
-      with:
-          fetch-depth: 0
-          path: docs
 
     - name: Set up changed-files
       id: changed-files-for-docs
@@ -39,9 +36,6 @@ jobs:
           echo "No deployment is needed"
           echo "DEPLOYMENT=false" >> "$GITHUB_ENV"
         fi
-    
-    - name: Checkout repository
-      uses: actions/checkout@v2
     
     - name: Define version name
       if: ${{ env.DEPLOYMENT == 'true' }}
