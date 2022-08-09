@@ -77,6 +77,27 @@ jobs:
         echo 'Reloading nginx'
         echo ${{ secrets.PASS_USER }} | sudo -S nginx -s reload
 
+    - name: Update latest
+      if: ${{ github.event.release.tag_name != '' }}
+      run: |
+        echo 'Change directory location to build html'
+        cd "${GITHUB_WORKSPACE}/docs/_build/${{ env.VERSION_NAME }}"
+        
+        echo 'Removing old build'
+        rm -rf /home/fmagalla/quasar/latest
+        echo ${{ secrets.PASS_USER }} | sudo -S rm -rf /usr/share/nginx/quasar/latest
+        
+        echo 'Copying new build to local'
+        mkdir -p /home/fmagalla/quasar/latest
+        cp -a . /home/fmagalla/quasar/latest/
+        
+        echo 'Copying to nginx folder'
+        echo ${{ secrets.PASS_USER }} | sudo -S mkdir -p /usr/share/nginx/quasar/latest
+        sudo cp -r /home/fmagalla/quasar/latest /usr/share/nginx/quasar
+        
+        echo 'Reloading nginx'
+        echo ${{ secrets.PASS_USER }} | sudo -S nginx -s reload
+
     - name: Update EOS page
       if: ${{ env.VERSION_NAME == 'latest' }}
       run: |
