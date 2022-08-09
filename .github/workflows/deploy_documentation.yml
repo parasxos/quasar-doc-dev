@@ -111,3 +111,8 @@ jobs:
         echo 'Copying new build to EOS'
         cp -a . /eos/project-q/quasar/www/
         cp -r /usr/share/nginx/quasar/version /eos/project-q/quasar/www
+
+    - name: Update versions
+      run: |
+        cd "${GITHUB_WORKSPACE}"
+        python3 ./docs/update_versions.py
