@@ -103,5 +103,5 @@ jobs:
       run: |
         cd "${GITHUB_WORKSPACE}/docs/_build/${{ env.VERSION_NAME }}"
 
-        echo 'Copying new build to EOS
-        cp -a . /eos/project-q/quasar/www
+        echo 'Copying new build to EOS'
+        cp -a . /eos/project-q/quasar/www/
